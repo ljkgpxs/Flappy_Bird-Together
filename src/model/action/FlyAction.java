@@ -2,6 +2,7 @@ package model.action;
 
 import model.Position;
 import model.Vector;
+import utils.MMath;
 
 public class FlyAction extends Action {
 
@@ -30,7 +31,7 @@ public class FlyAction extends Action {
      * @param duration 持续时间
      */
     public FlyAction(Position src, Vector distance, long duration) {
-        mDestPos = new Position(src.x + distance.x, src.y + distance.x);
+        mDestPos = new Position(src.x + distance.x, src.y + distance.y);
         mXDistance = distance.x;
         mYDistance = distance.y;
         setDuration(duration);
@@ -51,12 +52,22 @@ public class FlyAction extends Action {
         int xs = (int) (mXDistance * ((double)t / getDuration()));
         int ys = (int) (mYDistance * ((double)t / getDuration()));
 
-        if ((xs == 0 || ys == 0) && mXDistance != 0 && mYDistance != 0) {
-            return pos;
+        System.out.println("t: " + t + ", xs: " + xs + ", ys: " + ys);
+
+        // 检查相隔时间是否足够运动
+        if (MMath.abs(xs) <= 1) {
+            if (mXDistance != 0)
+                return pos;
         }
+        if (MMath.abs(ys) <= 1) {
+            if (mYDistance != 0)
+                return pos;
+        }
+
         pos.x = pos.x + xs;
         pos.y = pos.y + ys;
 
+        System.out.println(pos.getDistance(mDestPos) + ", " + pos.x + " " + pos.y + ", " + mDestPos.x + " " + mDestPos.y);
         if (pos.getDistance(mDestPos) < 10) {
             mPlayedCount++;
             mLastTime = 0;

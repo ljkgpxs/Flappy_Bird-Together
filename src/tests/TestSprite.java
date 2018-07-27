@@ -31,7 +31,7 @@ public class TestSprite extends JFrame {
         }
         animator.setDuration(700);
 
-        FlyAction action = new FlyAction(new Position(200, 300), new Vector(100, 200), 530);
+        FlyAction action = new FlyAction(new Position(200, 300), new Vector(0, -30), 10000);
 
         player.setAction(action);
 
