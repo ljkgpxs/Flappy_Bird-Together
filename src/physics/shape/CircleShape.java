@@ -18,4 +18,14 @@ public class CircleShape extends BaseShape {
     public void setRadius(double radius) {
         mRadius = radius;
     }
+
+    @Override
+    public int getWidth() {
+        return (int) (mRadius * 2);
+    }
+
+    @Override
+    public int getHeight() {
+        return (int) (mRadius * 2);
+    }
 }

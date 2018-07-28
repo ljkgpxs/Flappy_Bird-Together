@@ -10,6 +10,6 @@ public interface OnCollideListener {
      * @return 返回true表示已经处理碰撞, false表示未处理碰撞
      */
     default boolean onCollide(Sprite a, Sprite b) {
-        return true;
+        return false;
     }
 }

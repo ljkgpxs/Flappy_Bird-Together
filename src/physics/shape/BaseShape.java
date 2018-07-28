@@ -1,4 +1,6 @@
 package physics.shape;
 
-public class BaseShape {
+public abstract class BaseShape {
+    abstract public int getWidth();
+    abstract public int getHeight();
 }

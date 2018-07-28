@@ -9,7 +9,7 @@ public class FlyAction extends Action {
     private long mLastTime = 0;
 
     private Position mDestPos;
-    private int mXDistance, mYDistance;
+    private double mXDistance, mYDistance;
 
     /**
      * 从src移动到dest

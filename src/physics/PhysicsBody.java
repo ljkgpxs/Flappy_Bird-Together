@@ -18,10 +18,20 @@ public class PhysicsBody {
     private double mAngle;
 
     private boolean mIsGravityEnable = true;
+    private boolean mIsFixed = false;
 
     private Sprite mParentSprite;
 
     private OnCollideListener mOnCollideListener;
+
+    public PhysicsBody() {
+        mPosition = new Position(0, 0);
+        mCollideCode = 0x0;
+        mSpeed = new Vector(0, 0);
+        mWeight = 0.0;
+        mAngle = 0.0;
+        mParentSprite = null;
+    }
 
 
     public boolean tigerCollide(PhysicsBody body) {
@@ -73,6 +83,8 @@ public class PhysicsBody {
     }
 
     public double getWeight() {
+        if (mIsFixed)
+            return Double.MAX_VALUE;
         return mWeight;
     }
 
@@ -94,5 +106,30 @@ public class PhysicsBody {
 
     public void setGravityEnable(boolean gravityEnable) {
         mIsGravityEnable = gravityEnable;
+    }
+
+    /**
+     * 对刚体施力
+     * @param force 力的向量
+     */
+    public void applyForce(Vector force) {
+
+    }
+
+    /**
+     * 对刚体施力
+     * @param x x方向力的大小
+     * @param y y方向力的大小
+     */
+    public void applyForce(int x, int y) {
+
+    }
+
+    public boolean isFixed() {
+        return mIsFixed;
+    }
+
+    public void setFixed(boolean fixed) {
+        mIsFixed = fixed;
     }
 }

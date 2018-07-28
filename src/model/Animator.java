@@ -21,10 +21,11 @@ public class Animator {
 
     public Image getNextFrame() {
         if (mLastTime == 0) {
-            mLastTime = System.currentTimeMillis();
             mIndex = 0;
-            if (mFrames.size() > 0)
+            if (mFrames.size() > 0) {
+                mLastTime = System.currentTimeMillis();
                 return mFrames.get(0);
+            }
             else return null;
         }
 

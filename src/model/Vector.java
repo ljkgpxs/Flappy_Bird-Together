@@ -1,14 +1,14 @@
 package model;
 
 public class Vector {
-    public int x;
-    public int y;
+    public double x;
+    public double y;
 
     /**
      * 构造向量, 默认x和y方向为0
      */
     public Vector() {
-        this(0, 0);
+        this(0.0, 0.0);
     }
 
     /**
@@ -16,8 +16,13 @@ public class Vector {
      * @param x x方向大小
      * @param y y方向大小
      */
-    public Vector(int x, int y) {
+    public Vector(double x, double y) {
         this.x = x;
         this.y = y;
+    }
+
+    public Vector(Vector a) {
+        x = a.x;
+        y = a.y;
     }
 }

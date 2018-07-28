@@ -2,13 +2,15 @@ package model;
 
 import utils.MMath;
 
-public class Position extends Vector {
+public class Position {
+    public int x;
+    public int y;
 
     /**
      * 构造位置类, 默认x, y方向为0
      */
     public Position() {
-        super(0, 0);
+        this(0, 0);
     }
 
     /**
@@ -17,7 +19,13 @@ public class Position extends Vector {
      * @param y
      */
     public Position(int x, int y) {
-        super(x, y);
+        this.x = x;
+        this.y = y;
+    }
+
+    public Position(double x, double y) {
+        this.x = (int) x;
+        this.y = (int) y;
     }
 
     public int getDistance(Position p) {

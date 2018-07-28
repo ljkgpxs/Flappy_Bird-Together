@@ -14,16 +14,16 @@ public class RectangleShape extends BaseShape {
         mWidth = width;
     }
 
-    public double getWidth() {
-        return mWidth;
+    public int getWidth() {
+        return (int) mWidth;
     }
 
     public void setWidth(double width) {
         mWidth = width;
     }
 
-    public double getHeight() {
-        return mHeight;
+    public int getHeight() {
+        return (int) mHeight;
     }
 
     public void setHeight(double height) {
