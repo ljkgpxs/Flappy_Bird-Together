@@ -18,6 +18,8 @@ public class Sprite {
 
     private boolean isEnable = true;
 
+    private String mTag = "";
+
     public Action getAction() {
         return mAction;
     }
@@ -79,5 +81,13 @@ public class Sprite {
 
     public void paint(Graphics graphics) {
 
+    }
+
+    public String getTag() {
+        return mTag;
+    }
+
+    public void setTag(String tag) {
+        mTag = tag;
     }
 }

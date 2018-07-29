@@ -30,13 +30,14 @@ public class GameScene extends Scene implements KeyListener {
     private Screen mScreen;
 
     private int mDistance = 0;
+    private int mMapLength = 0;
     public static double mRunSpeed = 1.0;
 
     public GameScene(Map map) {
         mSprites = new ArrayList<>();
         mWorld = new World();
         mScreen = new Screen();
-
+        mMapLength = map.mMapLength;
 
         this.add(mScreen);
         this.addKeyListener(this);
@@ -71,7 +72,10 @@ public class GameScene extends Scene implements KeyListener {
             long t;
             while (true) {
                 t = System.currentTimeMillis();
-                mDistance += mRunSpeed;
+                if (mDistance > mMapLength) {
+                    dispose();
+                } else
+                    mDistance += mRunSpeed;
                 mScreen.repaint();
                 Toolkit.getDefaultToolkit().sync();
                 try {
@@ -101,6 +105,10 @@ public class GameScene extends Scene implements KeyListener {
 
     }
 
+    public int getDistance() {
+        return mDistance;
+    }
+
     private class Screen extends JPanel {
         private Image mBackImage;
         private Image mLandImage;
@@ -123,7 +131,6 @@ public class GameScene extends Scene implements KeyListener {
             super.paint(graphics);
 
             mLandLocation -= mRunSpeed;
-            mDistance += mRunSpeed;
 
             if (-mLandLocation >= WINDOW_WIDTH)
                 mLandLocation = 0;

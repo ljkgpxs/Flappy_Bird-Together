@@ -87,7 +87,6 @@ public class World {
     private void handleCollide() {
         for (int i = 0; i < mComponents.size(); i++) {
             for (int j = i + 1; j < mComponents.size(); j++) {
-                // TODO:
                 if ((mComponents.get(i).getCollideCode() & mComponents.get(j).getCollideCode()) == 0) {
                     continue;
                 }

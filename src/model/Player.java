@@ -27,6 +27,7 @@ public class Player extends Sprite {
 
     private long mSkillSpeedUpTimer = 0;
 
+
     public Player() {
         mAnimator = new Animator();
         mAnimator.setDuration(500);
@@ -43,7 +44,7 @@ public class Player extends Sprite {
         mPhysicsBody = new PhysicsBody();
 
         mPhysicsBody.setPosition(new Position(100, 200));
-        mPhysicsBody.setCollideCode(0x11);
+        mPhysicsBody.setCollideCode(0x111);
         mPhysicsBody.setSpeed(new Vector(0, 0));
         mPhysicsBody.setShape(new CircleShape(30));
         mPhysicsBody.setWeight(10);
@@ -51,6 +52,7 @@ public class Player extends Sprite {
 
         this.setAnimator(mAnimator);
         this.setPhysicsBody(mPhysicsBody);
+        this.setTag("Player");
     }
 
     @Override
@@ -58,7 +60,8 @@ public class Player extends Sprite {
         if (!mHandleKey)
             return;
         if (event.getKeyCode() == KeyEvent.VK_J) {
-            mPhysicsBody.setSpeed(new Vector(0, -5));
+            if (mPhysicsBody.getPosition().y < GameScene.WINDOW_HEIGHT - 112 - mPhysicsBody.getShape().getHeight())
+                mPhysicsBody.setSpeed(new Vector(0, -5));
         } else if (event.getKeyCode() == KeyEvent.VK_K)
             skillSpeedUp();
     }
@@ -68,7 +71,6 @@ public class Player extends Sprite {
             return;
         }
         mSkillSpeedUpTimer = System.currentTimeMillis();
-        System.out.println("Skill Speed up");
         new Thread(() -> {
             try {
                 GameScene.mRunSpeed = 3.0;
@@ -93,6 +95,9 @@ public class Player extends Sprite {
             punishTime();
             return true;
         }
+
+        if (a instanceof RemotePlayer)
+            return true;
 
         return false;
     }

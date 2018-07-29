@@ -11,7 +11,7 @@ import scenes.GameScene;
 public class Map implements Serializable {
 
     private List<Component> mComponentList;
-    private int mMapLength;
+    public int mMapLength;
 
     public static class Component {
         public SpriteType spriteType;
@@ -43,7 +43,7 @@ public class Map implements Serializable {
 
                 if (random.nextBoolean()) {
                     // 管道是否在上面
-                    position.y = l - 600;
+                    position.y = l - 600 - 50;
                 } else position.y = GameScene.WINDOW_HEIGHT - l - 40;
                 map.mComponentList.add(new Component(SpriteType.PIPE, l, position));
             }
