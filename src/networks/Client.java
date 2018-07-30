@@ -12,13 +12,14 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
+import listeners.OnGameStateListener;
 import model.Player;
 import model.Position;
 import model.RemotePlayer;
 import scenes.GameScene;
 import utils.Map;
 
-public class Client {
+public class Client implements OnGameStateListener {
     private GameScene mGameScene;
     private Player mPlayer;
     private Socket client;
@@ -31,6 +32,9 @@ public class Client {
 
     private List<RemotePlayerData> mRemotePlayerData;
     private List<RemotePlayer> mRemotePlayers;
+
+    private boolean mGameOver = false;
+    private long mGameTime = 0;
 
     private int mErrorsNum;
 
@@ -59,6 +63,7 @@ public class Client {
                 if (message.type == NetMessage.DataType.MAP_DATA) {
                     Map map = mGson.fromJson(message.data, Map.class);
                     mGameScene = new GameScene(map);
+                    mGameScene.setGameStateListener(this);
                     mGameScene.addSprite(mPlayer);
                 } else if (message.type == NetMessage.DataType.START_GAME) {
                     int count = Integer.parseInt(message.data);
@@ -84,6 +89,12 @@ public class Client {
                                         d.playerY)
                         );
                     }
+                } else if(message.type == NetMessage.DataType.GAME_OVER) {
+                    List<Long> time = mGson.fromJson(message.data, new TypeToken<ArrayList<Long>>(){}.getType());
+                    for (long t:time) {
+                        System.out.println(t);
+                    }
+                    break;
                 }
 
                 if (mGameStarted) {
@@ -94,6 +105,12 @@ public class Client {
                     NetMessage sendMessage = new NetMessage();
                     sendMessage.type = NetMessage.DataType.USER_POS;
                     sendMessage.data = data;
+
+                    if (mGameOver) {
+                        sendMessage.gameOver = true;
+                        sendMessage.time = mGameTime;
+                    }
+
                     mSender.write(mGson.toJson(sendMessage, NetMessage.class).getBytes());
                 }
                 sleep(10);
@@ -103,5 +120,16 @@ public class Client {
                 }
             }
         }
+    }
+
+    @Override
+    public void onGameOver(long time) {
+        mGameTime = time;
+        mGameOver = true;
+    }
+
+    @Override
+    public void onGameStart() {
+
     }
 }

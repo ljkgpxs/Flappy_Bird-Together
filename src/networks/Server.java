@@ -27,6 +27,8 @@ public class Server {
 
     private List<Boolean> mStartGame;
     private List<Boolean> mGameStarted;
+    private List<Boolean> mGameOver;
+    private List<Long> mGameTime;
 
     private List<Thread> mHandlers;
 
@@ -40,6 +42,8 @@ public class Server {
         mGameMap = Map.create();
         mStartGame = new ArrayList<>();
         mGameStarted = new ArrayList<>();
+        mGameTime = new ArrayList<>();
+        mGameOver = new ArrayList<>();
         mHandlers = new ArrayList<>();
         try {
             mServerSocket = new ServerSocket(mPort);
@@ -55,6 +59,8 @@ public class Server {
                 try {
                     Socket socket = mServerSocket.accept();
                     mGameStarted.add(false);
+                    mGameTime.add(Long.MAX_VALUE);
+                    mGameOver.add(false);
                     mStartGame.add(false);
                     mClientList.add(socket);
                     mClientsPosition.add(new RemotePlayerData());
@@ -102,6 +108,17 @@ public class Server {
                         mHandlers.get(id).interrupt();
                     }
                     NetMessage message = new NetMessage();
+                    int i;
+                    for (i = 0; i < mGameOver.size(); i++) {
+                        if (!mGameOver.get(i))
+                            break;
+                    }
+                    if (i == mGameOver.size()) {
+                        message.type = NetMessage.DataType.GAME_OVER;
+                        message.data = mGson.toJson(mGameTime, List.class);
+                        mSocket.getOutputStream().write(mGson.toJson(message, NetMessage.class).getBytes());
+                        break;
+                    }
                     if (mGameStarted.get(id)) {
                         byte[] data = new byte[5120];
                         mSocket.getInputStream().read(data);
@@ -110,6 +127,10 @@ public class Server {
                         if (clientMessage.type == NetMessage.DataType.USER_POS) {
                             mClientsPosition.set(id,
                                     mGson.fromJson(clientMessage.data, RemotePlayerData.class));
+                            if (clientMessage.gameOver) {
+                                mGameOver.set(id, true);
+                                mGameTime.set(id, clientMessage.time);
+                            }
                             //System.out.println("Got " + id + " position " + clientMessage.data);
                         } else {
                             System.out.println(clientMessage.data);
@@ -117,7 +138,7 @@ public class Server {
 
                         message.type = NetMessage.DataType.USER_POS;
                         List<RemotePlayerData> responseData = new ArrayList<>();
-                        for (int i = 0; i < mClientsPosition.size(); i++) {
+                        for (i = 0; i < mClientsPosition.size(); i++) {
                             if (i != id) {
                                 responseData.add(mClientsPosition.get(i));
                             }

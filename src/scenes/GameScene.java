@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
+import listeners.OnGameStateListener;
 import model.AirWall;
 import model.Pipe;
 import model.Player;
@@ -31,7 +32,14 @@ public class GameScene extends Scene implements KeyListener {
 
     private int mDistance = 0;
     private int mMapLength = 0;
-    public static double mRunSpeed = 1.0;
+    public static double mRunSpeed = 2.0;
+
+    private boolean mGameReady = true;
+    private long mGameTime = 0;
+
+    private int mId;
+
+    private OnGameStateListener mGameStateListener = null;
 
     public GameScene(Map map) {
         mSprites = new ArrayList<>();
@@ -66,14 +74,33 @@ public class GameScene extends Scene implements KeyListener {
     }
 
     public void start() {
+        if (mGameStateListener != null) {
+            mGameStateListener.onGameStart();
+        }
+
         this.setVisible(true);
-        mWorld.run();
+        new Thread(() -> {
+            mGameTime = System.currentTimeMillis();
+            mRunSpeed = 0.0;
+            try {
+                sleep(4000);
+                mGameReady = false;
+                mWorld.run();
+                mRunSpeed = 2.0;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
         new Thread(() -> {
             long t;
             while (true) {
                 t = System.currentTimeMillis();
-                if (mDistance > mMapLength) {
+                if (mDistance >= mMapLength) {
+                    if (mGameStateListener != null) {
+                        mGameStateListener.onGameOver(System.currentTimeMillis() - mGameTime - 2000);
+                    }
                     dispose();
+                    break;
                 } else
                     mDistance += mRunSpeed;
                 mScreen.repaint();
@@ -109,18 +136,30 @@ public class GameScene extends Scene implements KeyListener {
         return mDistance;
     }
 
+    public void setGameStateListener(OnGameStateListener listener) {
+        this.mGameStateListener = listener;
+    }
+
     private class Screen extends JPanel {
         private Image mBackImage;
         private Image mLandImage;
         private Image mBubbleImage;
+        private Image mReadyImage;
+        private Image[] mReadyNumbers;
 
         private int mLandLocation = 0;
 
         Screen() {
+            mReadyNumbers = new Image[4];
             try {
                 mBackImage = ImageIO.read(new File("resources/bg_day.png"));
                 mLandImage = ImageIO.read(new File("resources/land.png"));
                 mBubbleImage = ImageIO.read(new File("resources/bubble.png"));
+                mReadyImage = ImageIO.read(new File("resources/text_ready.png"));
+                mReadyNumbers[0] = ImageIO.read(new File("resources/number_context_00.png"));
+                mReadyNumbers[1] = ImageIO.read(new File("resources/number_context_01.png"));
+                mReadyNumbers[2] = ImageIO.read(new File("resources/number_context_02.png"));
+                mReadyNumbers[3] = ImageIO.read(new File("resources/number_context_03.png"));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -130,7 +169,8 @@ public class GameScene extends Scene implements KeyListener {
         public void paint(Graphics graphics) {
             super.paint(graphics);
 
-            mLandLocation -= mRunSpeed;
+            if (!mGameReady)
+                mLandLocation -= mRunSpeed;
 
             if (-mLandLocation >= WINDOW_WIDTH)
                 mLandLocation = 0;
@@ -185,6 +225,16 @@ public class GameScene extends Scene implements KeyListener {
                     WINDOW_HEIGHT - mLandImage.getHeight(null),
                     WINDOW_WIDTH, mLandImage.getHeight(null),
                     null);
+
+            if (mGameReady) {
+                graphics.drawImage(mReadyImage,
+                        (WINDOW_WIDTH - 400) / 2, (WINDOW_HEIGHT - 300) / 2,
+                        400, 130, null);
+                graphics.drawImage(mReadyNumbers[(int) (3 - (System.currentTimeMillis() - mGameTime) / 1000)],
+                        (WINDOW_WIDTH - 36) / 2, 400,
+                        36, 42, null);
+            }
+
         }
     }
 }

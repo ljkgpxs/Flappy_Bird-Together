@@ -100,7 +100,6 @@ public class MenuScene extends Scene implements MouseListener {
             }
             if (y >= 440 && y <= 490) {
                 System.exit(0);
-                return;
             }
         }
     }

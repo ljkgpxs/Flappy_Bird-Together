@@ -3,6 +3,8 @@ package networks;
 public class NetMessage {
     DataType type;
     String data;
+    boolean gameOver;
+    long time;
 
     enum DataType {
         USER_POS, // 发送位置数据

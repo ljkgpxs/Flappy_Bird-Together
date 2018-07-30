@@ -1,20 +1,14 @@
 package physics;
 
-import static java.lang.Thread.interrupted;
 import static java.lang.Thread.sleep;
-
-import com.sun.org.apache.regexp.internal.RE;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import model.AirWall;
 import model.Player;
 import model.Position;
-import model.Sprite;
 import model.Vector;
 import physics.shape.CircleShape;
-import physics.shape.RectangleShape;
 import utils.MMath;
 
 public class World {
@@ -133,9 +127,9 @@ public class World {
             return res;
         }
 
-        System.out.println("" + ma + " " + mb);
+        //System.out.println("" + ma + " " + mb);
 
-        System.out.println("swap speed");
+        //System.out.println("swap speed");
         res[0] = new Vector(vb);
         res[1] = new Vector(va);
         return res;

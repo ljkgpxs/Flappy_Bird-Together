@@ -70,10 +70,10 @@ public class Player extends Sprite {
         mSkillSpeedUpTimer = System.currentTimeMillis();
         new Thread(() -> {
             try {
-                GameScene.mRunSpeed = 3.0;
+                GameScene.mRunSpeed = 5.0;
                 sleep(2000);
                 if (mHandleKey)
-                    GameScene.mRunSpeed = 1.0;
+                    GameScene.mRunSpeed = 2.0;
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -119,7 +119,7 @@ public class Player extends Sprite {
 
             mWudi = true;
             mPhysicsBody.setGravityEnable(true);
-            GameScene.mRunSpeed = 1.0;
+            GameScene.mRunSpeed = 2.0;
             mPhysicsBody.setCollideCode(0x10);
             mHandleKey = true;
 

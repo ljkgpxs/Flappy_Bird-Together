@@ -1,6 +1,6 @@
 package listeners;
 
 public interface OnGameStateListener {
-    void onGameOver();
+    void onGameOver(long time);
     void onGameStart();
 }
