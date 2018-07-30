@@ -1,11 +1,8 @@
 package scenes;
 
-import static java.lang.Thread.sleep;
-
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 import javax.swing.*;
 
@@ -23,38 +20,26 @@ public class RoomScene extends Scene {
 
     private IpPort mIpPort;
     private Server mServer;
+    private Client mClient;
 
     public RoomScene(boolean isMaster, Server server) {
         mJLabel = new JLabel("Scanning...");
         if (isMaster) {
             mStartButton = new JButton("开始游戏");
-            mStartButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    try {
-                        Client client = new Client(mIpPort.getAddress().getHostAddress(), mIpPort.getPort());
-                        ServerBroadcast.stopBroadcast();
-                        new Thread(client::start).start();
-                        server.setStartGame(true);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
+            mStartButton.addActionListener(actionEvent -> {
+                mClient = new Client(mIpPort.getAddress().getHostAddress(), mIpPort.getPort());
+                ServerBroadcast.stopBroadcast();
+                new Thread(mClient::start).start();
+                server.setStartGame(true);
+                RoomScene.this.setVisible(false);
             });
         } else {
             mStartButton = new JButton("加入游戏");
-            mStartButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    try {
-                        Client client = new Client(mIpPort.getAddress().getHostAddress(), mIpPort.getPort());
-                        new Thread(client::start).start();
-                        mJLabel.setText("等待开始");
-                        mStartButton.setEnabled(false);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
+            mStartButton.addActionListener(actionEvent -> {
+                mClient = new Client(mIpPort.getAddress().getHostAddress(), mIpPort.getPort());
+                new Thread(mClient::start).start();
+                mJLabel.setText("等待开始");
+                mStartButton.setEnabled(false);
             });
         }
        mJLabel.setBounds(100, 100, 230, 40);
@@ -68,13 +53,11 @@ public class RoomScene extends Scene {
         add(new Panel());
 
         setSize(500, 380);
-        //setUndecorated(true);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
         new Thread(() -> {
             mIpPort =  ServerScanner.scan();
-            System.out.println("Done");
             mJLabel.setText("房间地址: " + mIpPort.getAddress().getHostAddress() + ":" + mIpPort.getPort());
             mStartButton.setEnabled(true);
         }).start();

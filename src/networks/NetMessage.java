@@ -4,11 +4,10 @@ public class NetMessage {
     DataType type;
     String data;
 
-    public static final String START_GAME = "start_game";
-
     enum DataType {
-        USER_POS,
-        MAP_DATA,
-        START_GAME
+        USER_POS, // 发送位置数据
+        MAP_DATA, // 发送地图数据
+        START_GAME, // 发送游戏人数
+        GAME_OVER // 发送总用时
     }
 }

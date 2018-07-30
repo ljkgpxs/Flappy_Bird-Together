@@ -23,8 +23,6 @@ public class TestNetwork {
             new Thread(client::start).start();
             sleep(1000);
             server.setStartGame(true);
-        } catch (IOException e) {
-            e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

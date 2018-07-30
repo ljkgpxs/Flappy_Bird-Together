@@ -19,7 +19,7 @@ public class ServerScanner {
                 byte[] recData = new byte[1024];
                 DatagramPacket recPacket = new DatagramPacket(recData, recData.length);
                 socket.receive(recPacket);
-
+                socket.close();
                 String message = new String(recPacket.getData()).trim();
                 Gson gson = new Gson();
                 BroadcastMessage rec = gson.fromJson(message, BroadcastMessage.class);

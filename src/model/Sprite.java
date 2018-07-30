@@ -10,8 +10,8 @@ import physics.PhysicsBody;
 
 public class Sprite {
     private Action mAction = null;
-    private Animator mAnimator = null;
-    private PhysicsBody mPhysicsBody = null;
+    protected Animator mAnimator = null;
+    protected PhysicsBody mPhysicsBody = null;
     private Weapon mWeapon = null;
 
     private KeyListener mKeyListener;

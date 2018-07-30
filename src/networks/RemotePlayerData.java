@@ -6,4 +6,10 @@ public class RemotePlayerData {
 
     long weaponDistance;
     long weaponY;
+
+    enum WeaponType {
+        GUN,
+        FIRE,
+        UNLIMITED
+    }
 }

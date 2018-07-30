@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact build-on-make="true" name="FlappyBirdTogather:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/FlappyBirdTogather_jar</output-path>
+    <root id="root">
+      <element id="archive" name="FlappyBirdTogather.jar">
+        <element id="module-output" name="FlappyBirdTogather" />
+      </element>
+      <element id="library" level="project" name="com.google.code.gson:gson:2.8.5" />
+    </root>
+  </artifact>
+</component>

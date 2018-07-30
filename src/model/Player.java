@@ -15,9 +15,6 @@ import physics.shape.CircleShape;
 import scenes.GameScene;
 
 public class Player extends Sprite {
-    private Animator mAnimator;
-    private PhysicsBody mPhysicsBody;
-
     private Image mSkillSpeedUp;
     private Image mSkillLoading;
 
@@ -59,7 +56,7 @@ public class Player extends Sprite {
     public void onKeyListener(KeyEvent event) {
         if (!mHandleKey)
             return;
-        if (event.getKeyCode() == KeyEvent.VK_J) {
+        if (event.getKeyCode() == KeyEvent.VK_SPACE) {
             if (mPhysicsBody.getPosition().y < GameScene.WINDOW_HEIGHT - 112 - mPhysicsBody.getShape().getHeight())
                 mPhysicsBody.setSpeed(new Vector(0, -5));
         } else if (event.getKeyCode() == KeyEvent.VK_K)
@@ -163,6 +160,9 @@ public class Player extends Sprite {
             }
             graphics.setColor(Color.WHITE);
             graphics.drawString("" + (5 -(System.currentTimeMillis() - mSkillSpeedUpTimer) / 1000), 117, 73);
+        } else {
+            graphics.setFont(new Font("宋体", Font.BOLD, 14));
+            graphics.drawString("K", 100, 30);
         }
 
     }

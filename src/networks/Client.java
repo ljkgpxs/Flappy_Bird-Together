@@ -32,10 +32,17 @@ public class Client {
     private List<RemotePlayerData> mRemotePlayerData;
     private List<RemotePlayer> mRemotePlayers;
 
-    public Client(String sAddress, int port) throws IOException {
-        client = new Socket(sAddress, port);
-        mSender = client.getOutputStream();
-        mReceiver = client.getInputStream();
+    private int mErrorsNum;
+
+    public Client(String sAddress, int port) {
+        try {
+            client = new Socket(sAddress, port);
+            mSender = client.getOutputStream();
+            mReceiver = client.getInputStream();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         mGson = new Gson();
         mPlayer = new Player();
         mRemotePlayerData = new ArrayList<>();
@@ -88,18 +95,12 @@ public class Client {
                     sendMessage.type = NetMessage.DataType.USER_POS;
                     sendMessage.data = data;
                     mSender.write(mGson.toJson(sendMessage, NetMessage.class).getBytes());
-                    sleep(0);
                 }
-
-
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            try {
                 sleep(10);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+                if (++mErrorsNum >= 3) {
+                    break;
+                }
             }
         }
     }
