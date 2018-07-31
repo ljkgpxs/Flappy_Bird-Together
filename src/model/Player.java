@@ -5,7 +5,6 @@ import static java.lang.Thread.sleep;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
@@ -142,6 +141,11 @@ public class Player extends Sprite {
     @Override
     public void paint(Graphics graphics) {
         super.paint(graphics);
+
+        Vector speed = mPhysicsBody.getSpeed();
+        double degree = speed.y * 5 > 90.0 ? 90.0 : speed.y * 5;
+        mPhysicsBody.setAngle(degree);
+
         graphics.drawImage(mSkillSpeedUp,
                 100, 30,
                 60, 60,

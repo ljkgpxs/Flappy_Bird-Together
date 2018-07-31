@@ -5,6 +5,7 @@ import static java.lang.Thread.sleep;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -36,6 +37,7 @@ public class GameScene extends Scene implements KeyListener {
 
     private boolean mGameReady = true;
     private long mGameTime = 0;
+    private boolean mGameOver = false;
 
     private int mId;
 
@@ -95,12 +97,11 @@ public class GameScene extends Scene implements KeyListener {
             long t;
             while (true) {
                 t = System.currentTimeMillis();
-                if (mDistance >= mMapLength) {
+                if (mDistance >= mMapLength && !mGameOver) {
                     if (mGameStateListener != null) {
                         mGameStateListener.onGameOver(System.currentTimeMillis() - mGameTime - 2000);
+                        mGameOver = true;
                     }
-                    dispose();
-                    break;
                 } else
                     mDistance += mRunSpeed;
                 mScreen.repaint();
@@ -185,8 +186,13 @@ public class GameScene extends Scene implements KeyListener {
             }
 
             for (Sprite s : mSprites) {
-                if (s.getPhysicsBody() == null || !s.isEnable())
+
+                if (!s.isEnable())
                     continue;
+
+                Graphics2D g2d = (Graphics2D) graphics;
+                AffineTransform old = g2d.getTransform();
+
                 int width = s.getPhysicsBody().getShape().getWidth();
                 int height = s.getPhysicsBody().getShape().getHeight();
 
@@ -197,6 +203,11 @@ public class GameScene extends Scene implements KeyListener {
 
                 if (s.getAnimator() != null) {
                     Image image = s.getAnimator().getNextFrame();
+                    int x = s.getPhysicsBody().getPosition().x;
+                    int y = s.getPhysicsBody().getPosition().y;
+                    g2d.rotate(Math.toRadians(s.getPhysicsBody().getAngle()),
+                            x +image.getWidth(null) / 2,
+                            y + image.getHeight(null) / 2);
                     if (s.getPhysicsBody().isFixed()) {
                         graphics.drawImage(image,
                                 s.getPhysicsBody().getPosition().x -= mRunSpeed,
@@ -214,6 +225,7 @@ public class GameScene extends Scene implements KeyListener {
                                 width + 10, height + 10, null);
                     }
                 }
+                g2d.setTransform(old);
             }
 
             graphics.drawImage(mLandImage,
