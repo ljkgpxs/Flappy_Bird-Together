@@ -1,5 +1,7 @@
 package networks;
 
+import java.util.List;
+
 public class RemotePlayerData {
     long playerDistance;
     long playerY;
@@ -7,6 +9,8 @@ public class RemotePlayerData {
 
     long weaponDistance;
     long weaponY;
+    String weaponId;
+    WeaponType weaponType;
 
     enum WeaponType {
         GUN,

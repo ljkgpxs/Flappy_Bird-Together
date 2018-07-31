@@ -1,5 +1,6 @@
 package model.weapon;
 
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 
@@ -50,19 +51,19 @@ public class GunWeapon extends Weapon {
         return new GunBullet();
     }
 
-    static class GunBullet extends Sprite {
-        GunBullet() {
+    public static class GunBullet extends Sprite {
+        public GunBullet() {
             mPhysicsBody = new PhysicsBody();
-            mPhysicsBody.setSpeed(new Vector(20, 0));
+            mPhysicsBody.setSpeed(new Vector(10, 0));
             mPhysicsBody.setGravityEnable(false);
             mPhysicsBody.setParentSprite(this);
-            mPhysicsBody.setShape(new RectangleShape(WIDTH, HEIGHT));
+            mPhysicsBody.setShape(new RectangleShape(50, 30));
             mPhysicsBody.setFixed(false);
-            mPhysicsBody.setCollideCode(0x1000);
+            mPhysicsBody.setCollideCode(0x10000);
 
             mAnimator = new Animator();
             try {
-                mAnimator.addFrame(ImageIO.read(new File("resources/gun.png")));
+                mAnimator.addFrame(ImageIO.read(new File("resources/gun_bullet.png")));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -70,7 +71,14 @@ public class GunWeapon extends Weapon {
 
         @Override
         public boolean onCollide(Sprite a) {
-            return super.onCollide(a);
+            setEnable(false);
+            mPhysicsBody.setCollideCode(0);
+            return true;
+        }
+
+        @Override
+        public void onKeyListener(KeyEvent event) {
+            super.onKeyListener(event);
         }
     }
 }

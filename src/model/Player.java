@@ -9,6 +9,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import listeners.OnWeaponBulletAddListener;
 import model.weapon.FireWeapon;
 import model.weapon.GunWeapon;
 import model.weapon.UnlimitedWeapon;
@@ -33,7 +34,9 @@ public class Player extends Sprite {
 
     private WeaponType mWeaponType = WeaponType.NONE;
 
-    private int mCollideCode = 0x1111;
+    private int mCollideCode = 0x11111;
+
+    private OnWeaponBulletAddListener mOnWeaponBulletAddListener;
 
     public Player() {
         mAnimator = new Animator();
@@ -79,6 +82,32 @@ public class Player extends Sprite {
             if (!mWudi) {
                 skillSpeedUp();
             }
+        } else if (event.getKeyCode() == KeyEvent.VK_J) {
+            if (mWeaponType == WeaponType.NONE) {
+                return;
+            }
+            long time = 0;
+            Sprite bullet;
+            if (mWeaponType == WeaponType.FIRE) {
+                time = FireWeapon.getLoadTime();
+                bullet = FireWeapon.getBullet();
+            } else {
+                time = GunWeapon.getLoadTime();
+                bullet = GunWeapon.getBullet();
+            }
+            if (System.currentTimeMillis() - mWeaponTimer < time) {
+                return;
+            }
+
+            mWeaponTimer = System.currentTimeMillis();
+            if (mOnWeaponBulletAddListener != null) {
+                bullet.getPhysicsBody().setPosition(
+                        new Position(
+                                mPhysicsBody.getPosition().x + 80,
+                                mPhysicsBody.getPosition().y)
+                );
+                mOnWeaponBulletAddListener.onWeaponBulletAdd(bullet);
+            }
         }
     }
 
@@ -107,8 +136,6 @@ public class Player extends Sprite {
         Vector speed = mPhysicsBody.getSpeed();
         Position position = mPhysicsBody.getPosition();
         if (a instanceof Pipe) {
-            speed.x = 0;
-            speed.y = 0;
             punishTime();
             return true;
         }
@@ -131,12 +158,26 @@ public class Player extends Sprite {
         }
 
         if (a instanceof GunWeapon) {
+            mWeaponTimer = 0;
             mWeaponType = WeaponType.GUN;
             return true;
         }
 
         if (a instanceof FireWeapon) {
+            mWeaponTimer = 0;
             mWeaponType = WeaponType.FIRE;
+            return true;
+        }
+
+        if (a instanceof GunWeapon.GunBullet) {
+            System.out.println("i am shot");
+            punishTime();
+            return true;
+        }
+
+        if (a instanceof FireWeapon.FireBullet) {
+            System.out.println("I am shot in Fire");
+            punishTime();
             return true;
         }
 
@@ -149,6 +190,10 @@ public class Player extends Sprite {
 
     private void punishTime() {
         new Thread(() -> {
+            Vector speed = mPhysicsBody.getSpeed();
+            speed.x = 0;
+            speed.y = 0;
+
             mHandleKey = false;
             mPhysicsBody.setGravityEnable(false);
             mPhysicsBody.setCollideCode(0);
@@ -183,9 +228,9 @@ public class Player extends Sprite {
         }).start();
     }
 
-    private boolean isWeaponReady() {
+    private long isWeaponReady() {
         if (mWeaponType == WeaponType.NONE) {
-            return false;
+            return Long.MAX_VALUE;
         }
 
         long time = 0;
@@ -195,11 +240,15 @@ public class Player extends Sprite {
             time = FireWeapon.getLoadTime();
         }
 
-        return System.currentTimeMillis() - mWeaponTimer >= time;
+        return -(System.currentTimeMillis() - mWeaponTimer - time);
     }
 
     public boolean isWudi() {
         return mWudi;
+    }
+
+    public void setOnWeaponBulletAddListener(OnWeaponBulletAddListener listener) {
+        mOnWeaponBulletAddListener = listener;
     }
 
     @Override
@@ -239,19 +288,6 @@ public class Player extends Sprite {
             graphics.drawString("K", 180, 30);
         }
 
-
-        if (isWeaponReady()) {
-            graphics.setColor(Color.BLACK);
-            graphics.setFont(new Font("宋体", Font.BOLD, 14));
-            graphics.drawString("J", 260, 30);
-        } else {
-            graphics.drawImage(mSkillLoading,
-                    260, 30,
-                    60, 60,
-                    null);
-        }
-
-
         if (mWeaponType == WeaponType.FIRE) {
             graphics.drawImage(mFireImage,
                     270, 45,
@@ -263,6 +299,25 @@ public class Player extends Sprite {
                     270, 50,
                     35, 25, null);
         }
+        graphics.setColor(Color.BLACK);
+        graphics.setFont(new Font("宋体", Font.BOLD, 14));
+        graphics.drawString("J", 260, 30);
+        long t = isWeaponReady();
+        if (t > 0) {
+            if (t == Long.MAX_VALUE || t < 300000) {
+                graphics.drawImage(mSkillLoading,
+                        260, 30,
+                        60, 60,
+                        null);
+            }
+            graphics.setFont(new Font("宋体", Font.BOLD, 36));
+            if (t < 300000) {
+                graphics.setColor(Color.WHITE);
+                graphics.drawString(String.valueOf(t / 1000),
+                        277, 73);
+            }
+        }
+
 
     }
 }

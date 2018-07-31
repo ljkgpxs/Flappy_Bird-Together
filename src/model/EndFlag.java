@@ -6,17 +6,14 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import physics.PhysicsBody;
-import physics.shape.CircleShape;
 import physics.shape.RectangleShape;
 
-public class Pipe extends Sprite {
-    public Pipe(Position position, int length) {
+public class EndFlag extends Sprite {
+    public EndFlag(Position position) {
         mAnimator = new Animator();
-        mAnimator.setDuration(500);
+        mAnimator.setDuration(50000);
         try {
-            if (position.y < 0)
-                mAnimator.addFrame(ImageIO.read(new File("resources/pipe_down.png")));
-            else mAnimator.addFrame(ImageIO.read(new File("resources/pipe_up.png")));
+            mAnimator.addFrame(ImageIO.read(new File("resources/end_flag.png")));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -24,9 +21,9 @@ public class Pipe extends Sprite {
         mPhysicsBody = new PhysicsBody();
 
         mPhysicsBody.setPosition(position);
-        mPhysicsBody.setCollideCode(0x01);
+        mPhysicsBody.setCollideCode(0x0);
         mPhysicsBody.setSpeed(new Vector(0, 0));
-        mPhysicsBody.setShape(new RectangleShape(90, 600));
+        mPhysicsBody.setShape(new RectangleShape(130, 530));
         mPhysicsBody.setWeight(0);
         mPhysicsBody.setGravityEnable(false);
         mPhysicsBody.setFixed(true);

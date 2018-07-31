@@ -47,22 +47,22 @@ public class FireWeapon extends Weapon {
     }
 
     public static long getLoadTime() {
-        return 2000;
+        return 1500;
     }
 
     public static Sprite getBullet() {
         return new FireBullet();
     }
 
-    static class FireBullet extends Sprite {
-        FireBullet() {
+    public static class FireBullet extends Sprite {
+        public FireBullet() {
             mPhysicsBody = new PhysicsBody();
-            mPhysicsBody.setSpeed(new Vector(10, 0));
+            mPhysicsBody.setSpeed(new Vector(4, 0));
             mPhysicsBody.setGravityEnable(false);
             mPhysicsBody.setParentSprite(this);
             mPhysicsBody.setShape(new RectangleShape(WIDTH, HEIGHT));
             mPhysicsBody.setFixed(false);
-            mPhysicsBody.setCollideCode(0x1000);
+            mPhysicsBody.setCollideCode(0x10000);
 
             mAnimator = new Animator();
             try {
@@ -74,7 +74,9 @@ public class FireWeapon extends Weapon {
 
         @Override
         public boolean onCollide(Sprite a) {
-            return super.onCollide(a);
+            setEnable(false);
+            mPhysicsBody.setCollideCode(0);
+            return true;
         }
     }
 }

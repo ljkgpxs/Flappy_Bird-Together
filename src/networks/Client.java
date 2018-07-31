@@ -1,7 +1,5 @@
 package networks;
 
-import static java.lang.Thread.sleep;
-
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -13,13 +11,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import listeners.OnGameStateListener;
+import listeners.OnWeaponBulletAddListener;
 import model.Player;
 import model.Position;
 import model.RemotePlayer;
+import model.Sprite;
+import model.weapon.FireWeapon;
+import model.weapon.GunWeapon;
 import scenes.GameScene;
 import utils.Map;
 
-public class Client implements OnGameStateListener {
+public class Client implements OnGameStateListener, OnWeaponBulletAddListener {
     private GameScene mGameScene;
     private Player mPlayer;
     private Socket client;
@@ -32,6 +34,11 @@ public class Client implements OnGameStateListener {
 
     private List<RemotePlayerData> mRemotePlayerData;
     private List<RemotePlayer> mRemotePlayers;
+
+    private List<String> mHandledWeaponId;
+
+    private Sprite mWeaponBullet;
+    private int mWeaponId;
 
     private boolean mGameOver = false;
     private long mGameTime = 0;
@@ -51,6 +58,9 @@ public class Client implements OnGameStateListener {
         mPlayer = new Player();
         mRemotePlayerData = new ArrayList<>();
         mRemotePlayers = new ArrayList<>();
+        mHandledWeaponId = new ArrayList<>();
+
+        mPlayer.setOnWeaponBulletAddListener(this);
     }
 
     public void start() {
@@ -100,6 +110,22 @@ public class Client implements OnGameStateListener {
                                 new Position(d.playerDistance - mGameScene.getDistance(),
                                         d.playerY)
                         );
+                        // 处理其他端发来的子弹信息
+                        if (data.get(i).weaponY != -1) {
+                            if (!mHandledWeaponId.contains(data.get(i).weaponId)) {
+                                Sprite bullet;
+                                if (data.get(i).weaponType == RemotePlayerData.WeaponType.FIRE) {
+                                    bullet = new FireWeapon.FireBullet();
+                                } else {
+                                    bullet = new GunWeapon.GunBullet();
+                                }
+                                bullet.getPhysicsBody().setPosition(new Position(
+                                        data.get(i).weaponDistance - mGameScene.getDistance(),
+                                        data.get(i).weaponY));
+                                mGameScene.addSprite(bullet);
+                                mHandledWeaponId.add(data.get(i).weaponId);
+                            }
+                        }
                     }
                 } else if (message.type == NetMessage.DataType.GAME_OVER) {
                     List<Long> time = mGson.fromJson(message.data,
@@ -109,6 +135,7 @@ public class Client implements OnGameStateListener {
                         System.out.println(t);
                     }
                     mGameScene.stopGame();
+                    client.close();
                     return;
                 }
 
@@ -117,6 +144,19 @@ public class Client implements OnGameStateListener {
                     playerData.playerDistance = mGameScene.getDistance() + 100;
                     playerData.playerY = mPlayer.getPhysicsBody().getPosition().y;
                     playerData.isWudi = mPlayer.isWudi();
+                    if (mWeaponBullet != null) {
+                        playerData.weaponY = mWeaponBullet.getPhysicsBody().getPosition().y;
+                        playerData.weaponDistance = playerData.playerDistance + 180;
+                        playerData.weaponId = client.getInetAddress().getHostAddress() + mWeaponId;
+                        if (mWeaponBullet instanceof FireWeapon.FireBullet) {
+                            playerData.weaponType = RemotePlayerData.WeaponType.FIRE;
+                        } else {
+                            playerData.weaponType = RemotePlayerData.WeaponType.GUN;
+                        }
+
+                    } else {
+                        playerData.weaponY = -1;
+                    }
                     String data = mGson.toJson(playerData, RemotePlayerData.class);
                     NetMessage sendMessage = new NetMessage();
                     sendMessage.type = NetMessage.DataType.USER_POS;
@@ -129,7 +169,7 @@ public class Client implements OnGameStateListener {
 
                     mSender.write(mGson.toJson(sendMessage, NetMessage.class).getBytes());
                 }
-                sleep(5);
+                //sleep(5);
             } catch (Exception e) {
                 if (++mErrorsNum >= 3) {
                     break;
@@ -142,11 +182,17 @@ public class Client implements OnGameStateListener {
     public void onGameOver(long time) {
         mGameTime = time;
         mGameOver = true;
-
     }
 
     @Override
     public void onGameStart() {
 
+    }
+
+    @Override
+    public void onWeaponBulletAdd(Sprite sprite) {
+        mGameScene.addSprite(sprite);
+        mWeaponBullet = sprite;
+        mWeaponId++;
     }
 }

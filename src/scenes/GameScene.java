@@ -9,12 +9,16 @@ import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import listeners.OnGameStateListener;
+import listeners.OnWeaponBulletAddListener;
 import model.AirWall;
+import model.EndFlag;
 import model.Pipe;
 import model.Player;
 import model.Position;
@@ -49,7 +53,7 @@ public class GameScene extends Scene implements KeyListener {
     private OnGameStateListener mGameStateListener = null;
 
     public GameScene(Map map) {
-        mSprites = new ArrayList<>();
+        mSprites = new CopyOnWriteArrayList<>();
         mWorld = new World();
         mScreen = new Screen();
         mMapLength = map.mMapLength;
@@ -75,6 +79,9 @@ public class GameScene extends Scene implements KeyListener {
                 }
             }
         }
+
+        this.addSprite(new EndFlag(new Position(map.mMapLength + 100, WINDOW_HEIGHT - 112 - 520)));
+
         this.addSprite(new AirWall(new Position(0, -112)));
         this.addSprite(new AirWall(new Position(0, WINDOW_HEIGHT - 112)));
 
@@ -120,7 +127,7 @@ public class GameScene extends Scene implements KeyListener {
                 if (mDistance >= mMapLength && !mGameOver) {
                     if (mGameStateListener != null) {
                         mGameStateListener.onGameOver(
-                                System.currentTimeMillis() - mGameTime - 2000);
+                                mGameTime = System.currentTimeMillis() - mGameTime - 2000);
                         mGameOver = true;
                     }
                 } else {
@@ -148,8 +155,9 @@ public class GameScene extends Scene implements KeyListener {
         if (mGameOver || mGameReady) {
             return;
         }
-        for (Sprite s : mSprites) {
-            s.onKeyListener(keyEvent);
+
+        for (Sprite mSprite : mSprites) {
+            mSprite.onKeyListener(keyEvent);
         }
     }
 
@@ -289,6 +297,10 @@ public class GameScene extends Scene implements KeyListener {
                 graphics.drawImage(mGameOverGif,
                         (WINDOW_WIDTH - 400) / 2, (WINDOW_HEIGHT - 300) / 2,
                         400, 130, null);
+                graphics.setFont(new Font("宋体", Font.BOLD, 24));
+                graphics.setColor(Color.WHITE);
+                graphics.drawString(String.format("用时%.2f秒", mGameTime / 1000.0),
+                        500, 400);
             }
 
         }

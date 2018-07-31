@@ -3,11 +3,14 @@ package physics;
 import static java.lang.Thread.sleep;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import model.Player;
 import model.Position;
 import model.Vector;
+import model.weapon.GunWeapon;
 import physics.shape.CircleShape;
 import utils.MMath;
 
@@ -29,7 +32,7 @@ public class World {
      * @param gravity 重力G
      */
     public World(double gravity) {
-        mComponents = new ArrayList<>();
+        mComponents = new CopyOnWriteArrayList<>();
         mGravity = gravity;
     }
 
@@ -54,6 +57,13 @@ public class World {
 
                     Vector speed = body.getSpeed();
                     Position pos = body.getPosition();
+
+                    if (pos.x >= Short.MAX_VALUE || pos.y >= Short.MAX_VALUE) {
+                        body.getParentSprite().setEnable(false);
+                        mComponents.remove(body);
+                        continue;
+                    }
+
                     pos.x = (int) (pos.x + speed.x);
                     if (body.isGravityEnable() && body.getWeight() > 0.0) {
                         speed.y += mGravity * 0.016;
@@ -61,9 +71,11 @@ public class World {
 
                     pos.x += speed.x;
                     pos.y += speed.y;
-                    if (body.getParentSprite() instanceof Player) {
-                        if (pos.y == 0)
-                            pos.y += 1;
+
+                    if (speed.y != 0 && speed.y < 1.0 && speed.y > -1.0) {
+                        if (speed.y < 0)
+                            pos.y -= 1;
+                        else pos.y += 1;
                     }
                 }
 

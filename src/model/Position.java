@@ -31,4 +31,9 @@ public class Position {
     public int getDistance(Position p) {
         return MMath.triangle(x - p.x, y - p.y);
     }
+
+    @Override
+    public String toString() {
+        return "x:" + x + ", y:" + y;
+    }
 }

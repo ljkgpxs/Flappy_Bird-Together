@@ -176,8 +176,8 @@ public class MenuScene extends Scene implements MouseListener {
                     null);
 
             graphics.drawImage(mHelpImage,
-                    100, WINDOW_HEIGHT - 240,
-                    200, 100, null);
+                    100, WINDOW_HEIGHT - 290,
+                    200, 150, null);
 
             graphics.drawImage(mCreate,
                     (WINDOW_WIDTH - 200) / 2, 300,
