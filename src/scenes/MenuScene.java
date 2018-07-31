@@ -27,7 +27,6 @@ import physics.shape.RectangleShape;
 import scenes.core.Scene;
 
 public class MenuScene extends Scene implements MouseListener {
-    private World mWorld;
     private final static int WINDOW_WIDTH = 1280;
     private final static int WINDOW_HEIGHT = 720;
 
@@ -35,10 +34,10 @@ public class MenuScene extends Scene implements MouseListener {
 
     private int mDistance = 0;
     private double mRunSpeed = 1.0;
+    private boolean mExit = false;
 
     public MenuScene() {
         mSprites = new ArrayList<>();
-        mWorld = new World();
         mScreen = new Screen();
 
         this.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -56,15 +55,16 @@ public class MenuScene extends Scene implements MouseListener {
     @Override
     public void addSprite(Sprite sprite) {
         super.addSprite(sprite);
-        mWorld.addComponent(sprite.getPhysicsBody());
     }
 
     public void start() {
         this.setVisible(true);
-        mWorld.run();
         new Thread(() -> {
             long t;
             while (true) {
+                if (mExit) {
+                    break;
+                }
                 t = System.currentTimeMillis();
                 mDistance += mRunSpeed;
                 mScreen.repaint();
@@ -90,11 +90,13 @@ public class MenuScene extends Scene implements MouseListener {
                 server.start();
                 ServerBroadcast.sendBroadcast(2333);
                 new RoomScene(true, server);
+                mExit = true;
                 dispose();
                 return;
             }
             if (y >= 370 && y <= 420) {
                 new RoomScene(false, null);
+                mExit = true;
                 dispose();
                 return;
             }
@@ -128,6 +130,7 @@ public class MenuScene extends Scene implements MouseListener {
         private Image mBackImage;
         private Image mLandImage;
         private Image mTitleImage;
+        private Image mHelpImage;
 
         private Image mCreate, mJoin, mQuit;
 
@@ -141,6 +144,7 @@ public class MenuScene extends Scene implements MouseListener {
                 mCreate = ImageIO.read(new File("resources/button_create_room.png"));
                 mJoin = ImageIO.read(new File("resources/button_join_room.png"));
                 mQuit = ImageIO.read(new File("resources/button_quit.png"));
+                mHelpImage = ImageIO.read(new File("resources/help.png"));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -170,6 +174,10 @@ public class MenuScene extends Scene implements MouseListener {
             graphics.drawImage(mTitleImage,
                     (WINDOW_WIDTH - mTitleImage.getWidth(null)) / 2, 100,
                     null);
+
+            graphics.drawImage(mHelpImage,
+                    100, WINDOW_HEIGHT - 240,
+                    200, 100, null);
 
             graphics.drawImage(mCreate,
                     (WINDOW_WIDTH - 200) / 2, 300,

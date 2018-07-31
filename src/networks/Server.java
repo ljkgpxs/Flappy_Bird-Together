@@ -5,13 +5,11 @@ import static java.lang.Thread.sleep;
 import com.google.gson.Gson;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-import model.Position;
 import utils.Map;
 
 public class Server {
@@ -31,6 +29,8 @@ public class Server {
     private List<Long> mGameTime;
 
     private List<Thread> mHandlers;
+
+    private Thread mAcceptThread;
 
     private Gson mGson;
 
@@ -53,9 +53,10 @@ public class Server {
     }
 
     public void start() {
-        new Thread(() -> {
+        mAcceptThread =new Thread(() -> {
             int i = 0;
             while (true) {
+
                 try {
                     Socket socket = mServerSocket.accept();
                     mGameStarted.add(false);
@@ -69,10 +70,12 @@ public class Server {
                     mHandlers.get(i).start();
                     i++;
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    //e.printStackTrace();
+                    break;
                 }
             }
-        }).start();
+        });
+        mAcceptThread.start();
     }
 
     public void setStartGame(boolean startGame) {
@@ -117,6 +120,8 @@ public class Server {
                         message.type = NetMessage.DataType.GAME_OVER;
                         message.data = mGson.toJson(mGameTime, List.class);
                         mSocket.getOutputStream().write(mGson.toJson(message, NetMessage.class).getBytes());
+                        mServerSocket.close();
+                        mAcceptThread.interrupt();
                         break;
                     }
                     if (mGameStarted.get(id)) {
@@ -124,6 +129,7 @@ public class Server {
                         mSocket.getInputStream().read(data);
                         NetMessage clientMessage = mGson.fromJson(new String(data).trim(),
                                 NetMessage.class);
+                        // 接收到客户端传来的位置信息
                         if (clientMessage.type == NetMessage.DataType.USER_POS) {
                             mClientsPosition.set(id,
                                     mGson.fromJson(clientMessage.data, RemotePlayerData.class));
@@ -156,10 +162,11 @@ public class Server {
                         mGameStarted.set(id, true);
                         continue;
                     }
-                    sleep(10);
+                    sleep(5);
                 } catch (Exception e) {
                     if (++mErrorsNum >= 3) {
                         mHandlers.get(id).interrupt();
+                        mGameOver.set(id, true);
                         break;
                     }
                 }

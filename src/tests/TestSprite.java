@@ -23,9 +23,9 @@ public class TestSprite extends JFrame {
         player = new Sprite();
         Animator animator = new Animator();
         try {
-            animator.addFrame(ImageIO.read(new File("/run/media/ljkgpxs/source/src/Flappy_bird/Resources/bird0_0.png")));
-            animator.addFrame(ImageIO.read(new File("/run/media/ljkgpxs/source/src/Flappy_bird/Resources/bird0_1.png")));
-            animator.addFrame(ImageIO.read(new File("/run/media/ljkgpxs/source/src/Flappy_bird/Resources/bird0_2.png")));
+            animator.addFrame(ImageIO.read(new File("resources/bird0_0.png")));
+            animator.addFrame(ImageIO.read(new File("resources/bird0_1.png")));
+            animator.addFrame(ImageIO.read(new File("resources/bird0_2.png")));
         } catch (IOException e) {
             e.printStackTrace();
         }

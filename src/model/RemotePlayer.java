@@ -29,7 +29,7 @@ public class RemotePlayer extends Sprite {
         mPhysicsBody = new PhysicsBody();
 
         mPhysicsBody.setPosition(new Position(100, 200));
-        mPhysicsBody.setCollideCode(0x1000);
+        mPhysicsBody.setCollideCode(0x0);
         mPhysicsBody.setSpeed(new Vector(0, 0));
         mPhysicsBody.setShape(new CircleShape(30));
         mPhysicsBody.setWeight(10);

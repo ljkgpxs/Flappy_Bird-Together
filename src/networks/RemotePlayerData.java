@@ -3,6 +3,7 @@ package networks;
 public class RemotePlayerData {
     long playerDistance;
     long playerY;
+    boolean isWudi;
 
     long weaponDistance;
     long weaponY;

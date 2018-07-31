@@ -6,6 +6,9 @@
         <element id="module-output" name="FlappyBirdTogather" />
       </element>
       <element id="library" level="project" name="com.google.code.gson:gson:2.8.5" />
+      <element id="directory" name="resources">
+        <element id="dir-copy" path="$PROJECT_DIR$/resources" />
+      </element>
     </root>
   </artifact>
 </component>

@@ -19,8 +19,12 @@ import model.Pipe;
 import model.Player;
 import model.Position;
 import model.Sprite;
+import model.weapon.FireWeapon;
+import model.weapon.GunWeapon;
+import model.weapon.UnlimitedWeapon;
 import physics.World;
 import scenes.core.Scene;
+import utils.MMath;
 import utils.Map;
 import utils.SpriteType;
 
@@ -38,6 +42,7 @@ public class GameScene extends Scene implements KeyListener {
     private boolean mGameReady = true;
     private long mGameTime = 0;
     private boolean mGameOver = false;
+    private boolean mStopGame = false;
 
     private int mId;
 
@@ -54,8 +59,20 @@ public class GameScene extends Scene implements KeyListener {
 
         for (Map.Component component : map.getComponentList()) {
             if (component.spriteType == SpriteType.PIPE) {
-                //System.out.println("Pipe pos: " + component.position.x + " " + component.position.y);
+                //System.out.println("Pipe pos: " + component.position.x + " " + component
+                // .position.y);
                 this.addSprite(new Pipe(component.position, component.pipLength));
+            } else if (component.spriteType == SpriteType.WEAPON) {
+                switch (component.weaponType) {
+                    case GUN:
+                        this.addSprite(new GunWeapon(component.position));
+                        break;
+                    case FIRE:
+                        this.addSprite(new FireWeapon(component.position));
+                        break;
+                    case UNLIMITED:
+                        this.addSprite(new UnlimitedWeapon(component.position));
+                }
             }
         }
         this.addSprite(new AirWall(new Position(0, -112)));
@@ -96,14 +113,19 @@ public class GameScene extends Scene implements KeyListener {
         new Thread(() -> {
             long t;
             while (true) {
+                if (mStopGame) {
+                    break;
+                }
                 t = System.currentTimeMillis();
                 if (mDistance >= mMapLength && !mGameOver) {
                     if (mGameStateListener != null) {
-                        mGameStateListener.onGameOver(System.currentTimeMillis() - mGameTime - 2000);
+                        mGameStateListener.onGameOver(
+                                System.currentTimeMillis() - mGameTime - 2000);
                         mGameOver = true;
                     }
-                } else
+                } else {
                     mDistance += mRunSpeed;
+                }
                 mScreen.repaint();
                 Toolkit.getDefaultToolkit().sync();
                 try {
@@ -123,6 +145,9 @@ public class GameScene extends Scene implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent keyEvent) {
+        if (mGameOver || mGameReady) {
+            return;
+        }
         for (Sprite s : mSprites) {
             s.onKeyListener(keyEvent);
         }
@@ -131,6 +156,12 @@ public class GameScene extends Scene implements KeyListener {
     @Override
     public void keyReleased(KeyEvent keyEvent) {
 
+    }
+
+    public void stopGame() {
+        mStopGame = true;
+        mWorld.stopEmulator();
+        dispose();
     }
 
     public int getDistance() {
@@ -147,6 +178,7 @@ public class GameScene extends Scene implements KeyListener {
         private Image mBubbleImage;
         private Image mReadyImage;
         private Image[] mReadyNumbers;
+        private Image mGameOverGif;
 
         private int mLandLocation = 0;
 
@@ -161,6 +193,7 @@ public class GameScene extends Scene implements KeyListener {
                 mReadyNumbers[1] = ImageIO.read(new File("resources/number_context_01.png"));
                 mReadyNumbers[2] = ImageIO.read(new File("resources/number_context_02.png"));
                 mReadyNumbers[3] = ImageIO.read(new File("resources/number_context_03.png"));
+                mGameOverGif = Toolkit.getDefaultToolkit().createImage("resources/game_over.gif");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -170,11 +203,13 @@ public class GameScene extends Scene implements KeyListener {
         public void paint(Graphics graphics) {
             super.paint(graphics);
 
-            if (!mGameReady)
+            if (!mGameReady) {
                 mLandLocation -= mRunSpeed;
+            }
 
-            if (-mLandLocation >= WINDOW_WIDTH)
+            if (-mLandLocation >= WINDOW_WIDTH) {
                 mLandLocation = 0;
+            }
 
             graphics.drawImage(mBackImage,
                     0, 0,
@@ -187,8 +222,9 @@ public class GameScene extends Scene implements KeyListener {
 
             for (Sprite s : mSprites) {
 
-                if (!s.isEnable())
+                if (!s.isEnable()) {
                     continue;
+                }
 
                 Graphics2D g2d = (Graphics2D) graphics;
                 AffineTransform old = g2d.getTransform();
@@ -206,21 +242,22 @@ public class GameScene extends Scene implements KeyListener {
                     int x = s.getPhysicsBody().getPosition().x;
                     int y = s.getPhysicsBody().getPosition().y;
                     g2d.rotate(Math.toRadians(s.getPhysicsBody().getAngle()),
-                            x +image.getWidth(null) / 2,
+                            x + image.getWidth(null) / 2,
                             y + image.getHeight(null) / 2);
                     if (s.getPhysicsBody().isFixed()) {
                         graphics.drawImage(image,
                                 s.getPhysicsBody().getPosition().x -= mRunSpeed,
                                 s.getPhysicsBody().getPosition().y,
                                 width, height, null);
+                    } else {
+                        graphics.drawImage(image,
+                                s.getPhysicsBody().getPosition().x,
+                                s.getPhysicsBody().getPosition().y,
+                                width, height, null);
                     }
-                    else graphics.drawImage(image,
-                            s.getPhysicsBody().getPosition().x,
-                            s.getPhysicsBody().getPosition().y,
-                            width, height, null);
                     if (s instanceof Player && ((Player) s).isWudi()) {
                         graphics.drawImage(mBubbleImage,
-                                s.getPhysicsBody().getPosition().x -5,
+                                s.getPhysicsBody().getPosition().x - 5,
                                 s.getPhysicsBody().getPosition().y - 5,
                                 width + 10, height + 10, null);
                     }
@@ -242,9 +279,16 @@ public class GameScene extends Scene implements KeyListener {
                 graphics.drawImage(mReadyImage,
                         (WINDOW_WIDTH - 400) / 2, (WINDOW_HEIGHT - 300) / 2,
                         400, 130, null);
-                graphics.drawImage(mReadyNumbers[(int) (3 - (System.currentTimeMillis() - mGameTime) / 1000)],
-                        (WINDOW_WIDTH - 36) / 2, 400,
+                graphics.drawImage(mReadyNumbers[MMath.abs(
+                        (int) (3 - (System.currentTimeMillis() - mGameTime) / 1000))],
+                        (WINDOW_WIDTH - 36) / 2, 350,
                         36, 42, null);
+            }
+
+            if (mGameOver) {
+                graphics.drawImage(mGameOverGif,
+                        (WINDOW_WIDTH - 400) / 2, (WINDOW_HEIGHT - 300) / 2,
+                        400, 130, null);
             }
 
         }

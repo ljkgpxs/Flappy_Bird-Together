@@ -9,20 +9,31 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import model.weapon.FireWeapon;
+import model.weapon.GunWeapon;
+import model.weapon.UnlimitedWeapon;
+import model.weapon.Weapon;
 import physics.PhysicsBody;
 import physics.shape.CircleShape;
 import scenes.GameScene;
+import utils.WeaponType;
 
 public class Player extends Sprite {
     private Image mSkillSpeedUp;
     private Image mSkillLoading;
+
+    private Image mWeaponSlot, mFireImage, mGunImage;
 
     private boolean mHandleKey = true;
 
     private boolean mWudi = false;
 
     private long mSkillSpeedUpTimer = 0;
+    private long mWeaponTimer = 0;
 
+    private WeaponType mWeaponType = WeaponType.NONE;
+
+    private int mCollideCode = 0x1111;
 
     public Player() {
         mAnimator = new Animator();
@@ -33,6 +44,9 @@ public class Player extends Sprite {
             mAnimator.addFrame(ImageIO.read(new File("resources/bird0_2.png")));
             mSkillSpeedUp = ImageIO.read(new File("resources/speed_up.png"));
             mSkillLoading = ImageIO.read(new File("resources/skill_loading.png"));
+            mWeaponSlot = ImageIO.read(new File("resources/weapon_slot.png"));
+            mGunImage = ImageIO.read(new File("resources/gun.png"));
+            mFireImage = ImageIO.read(new File("resources/fire.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -40,7 +54,7 @@ public class Player extends Sprite {
         mPhysicsBody = new PhysicsBody();
 
         mPhysicsBody.setPosition(new Position(100, 200));
-        mPhysicsBody.setCollideCode(0x111);
+        mPhysicsBody.setCollideCode(mCollideCode);
         mPhysicsBody.setSpeed(new Vector(0, 0));
         mPhysicsBody.setShape(new CircleShape(30));
         mPhysicsBody.setWeight(10);
@@ -53,13 +67,19 @@ public class Player extends Sprite {
 
     @Override
     public void onKeyListener(KeyEvent event) {
-        if (!mHandleKey)
+        if (!mHandleKey) {
             return;
+        }
         if (event.getKeyCode() == KeyEvent.VK_SPACE) {
-            if (mPhysicsBody.getPosition().y < GameScene.WINDOW_HEIGHT - 112 - mPhysicsBody.getShape().getHeight())
+            if (mPhysicsBody.getPosition().y
+                    < GameScene.WINDOW_HEIGHT - 112 - mPhysicsBody.getShape().getHeight()) {
                 mPhysicsBody.setSpeed(new Vector(0, -5));
-        } else if (event.getKeyCode() == KeyEvent.VK_K)
-            skillSpeedUp();
+            }
+        } else if (event.getKeyCode() == KeyEvent.VK_K) {
+            if (!mWudi) {
+                skillSpeedUp();
+            }
+        }
     }
 
     private void skillSpeedUp() {
@@ -71,8 +91,9 @@ public class Player extends Sprite {
             try {
                 GameScene.mRunSpeed = 5.0;
                 sleep(2000);
-                if (mHandleKey)
+                if (mHandleKey && !mWudi) {
                     GameScene.mRunSpeed = 2.0;
+                }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -92,8 +113,36 @@ public class Player extends Sprite {
             return true;
         }
 
-        if (a instanceof RemotePlayer)
+        if (a instanceof UnlimitedWeapon) {
+            new Thread(() -> {
+                mWudi = true;
+                GameScene.mRunSpeed = 7.0;
+                mPhysicsBody.setCollideCode(0x10);
+                try {
+                    sleep(4000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                mWudi = false;
+                GameScene.mRunSpeed = 2.0;
+                mPhysicsBody.setCollideCode(mCollideCode);
+            }).start();
             return true;
+        }
+
+        if (a instanceof GunWeapon) {
+            mWeaponType = WeaponType.GUN;
+            return true;
+        }
+
+        if (a instanceof FireWeapon) {
+            mWeaponType = WeaponType.FIRE;
+            return true;
+        }
+
+        if (a instanceof RemotePlayer) {
+            return true;
+        }
 
         return false;
     }
@@ -128,10 +177,25 @@ public class Player extends Sprite {
                 e.printStackTrace();
             }
 
-            mPhysicsBody.setCollideCode(0x11);
+            mPhysicsBody.setCollideCode(mCollideCode);
             mWudi = false;
 
         }).start();
+    }
+
+    private boolean isWeaponReady() {
+        if (mWeaponType == WeaponType.NONE) {
+            return false;
+        }
+
+        long time = 0;
+        if (mWeaponType == WeaponType.GUN) {
+            time = GunWeapon.getLoadTime();
+        } else {
+            time = FireWeapon.getLoadTime();
+        }
+
+        return System.currentTimeMillis() - mWeaponTimer >= time;
     }
 
     public boolean isWudi() {
@@ -147,26 +211,57 @@ public class Player extends Sprite {
         mPhysicsBody.setAngle(degree);
 
         graphics.drawImage(mSkillSpeedUp,
-                100, 30,
+                180, 30,
+                60, 60,
+                null);
+        graphics.drawImage(mWeaponSlot,
+                260, 30,
                 60, 60,
                 null);
         if (System.currentTimeMillis() - mSkillSpeedUpTimer < 5000) {
             graphics.drawImage(mSkillLoading,
-                    100, 30,
+                    180, 30,
                     60, 60,
                     null);
             //graphics.setFont(new Font(new File("resources/fonts/arial.ttf"), ));
             try {
-                graphics.setFont(Font.createFont(Font.TRUETYPE_FONT, new File("resources/fonts/Marker Felt.ttf")));
+                graphics.setFont(Font.createFont(Font.TRUETYPE_FONT,
+                        new File("resources/fonts/Marker Felt.ttf")));
                 graphics.setFont(new Font("Marker Felt", Font.BOLD, 36));
             } catch (FontFormatException | IOException e) {
                 e.printStackTrace();
             }
             graphics.setColor(Color.WHITE);
-            graphics.drawString("" + (5 -(System.currentTimeMillis() - mSkillSpeedUpTimer) / 1000), 117, 73);
+            graphics.drawString("" + (5 - (System.currentTimeMillis() - mSkillSpeedUpTimer) / 1000),
+                    197, 73);
         } else {
             graphics.setFont(new Font("宋体", Font.BOLD, 14));
-            graphics.drawString("K", 100, 30);
+            graphics.drawString("K", 180, 30);
+        }
+
+
+        if (isWeaponReady()) {
+            graphics.setColor(Color.BLACK);
+            graphics.setFont(new Font("宋体", Font.BOLD, 14));
+            graphics.drawString("J", 260, 30);
+        } else {
+            graphics.drawImage(mSkillLoading,
+                    260, 30,
+                    60, 60,
+                    null);
+        }
+
+
+        if (mWeaponType == WeaponType.FIRE) {
+            graphics.drawImage(mFireImage,
+                    270, 45,
+                    40, 28, null);
+        }
+
+        if (mWeaponType == WeaponType.GUN) {
+            graphics.drawImage(mGunImage,
+                    270, 50,
+                    35, 25, null);
         }
 
     }

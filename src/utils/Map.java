@@ -1,5 +1,6 @@
 package utils;
 
+import java.awt.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,12 +16,19 @@ public class Map implements Serializable {
 
     public static class Component {
         public SpriteType spriteType;
+        public WeaponType weaponType;
         public int pipLength;
         public Position position;
 
         Component(SpriteType spriteType, int pipLength, Position position) {
             this.spriteType = spriteType;
             this.pipLength = pipLength;
+            this.position = position;
+        }
+
+        Component(SpriteType spriteType, WeaponType weaponType, Position position) {
+            this.spriteType = spriteType;
+            this.weaponType = weaponType;
             this.position = position;
         }
     }
@@ -44,14 +52,27 @@ public class Map implements Serializable {
                 if (random.nextBoolean()) {
                     // 管道是否在上面
                     position.y = l - 600 - 50;
-                } else position.y = GameScene.WINDOW_HEIGHT - l - 40;
+                } else {
+                    position.y = GameScene.WINDOW_HEIGHT - l - 40;
+                }
                 map.mComponentList.add(new Component(SpriteType.PIPE, l, position));
             }
 
-            if ((i + 100) % 500 == 0 ) {
-                if (random.nextInt(100) < 20) {
-                    Position position = new Position(i, 100 + random.nextInt(GameScene.WINDOW_HEIGHT - 200));
-                    map.mComponentList.add(new Component(SpriteType.WEAPON, 50, position));
+            if (i % 500 == 0) {
+                if (random.nextInt(100) < 50) {
+                    Position position = new Position(i + 250,
+                            100 + random.nextInt(GameScene.WINDOW_HEIGHT - 200));
+                    int weaponCode = random.nextInt(100);
+                    if (weaponCode < 20) {
+                        map.mComponentList.add(
+                                new Component(SpriteType.WEAPON, WeaponType.UNLIMITED, position));
+                    } else if (weaponCode < 60) {
+                        map.mComponentList.add(
+                                new Component(SpriteType.WEAPON, WeaponType.FIRE, position));
+                    } else {
+                        map.mComponentList.add(
+                                new Component(SpriteType.WEAPON, WeaponType.GUN, position));
+                    }
                 }
             }
         }

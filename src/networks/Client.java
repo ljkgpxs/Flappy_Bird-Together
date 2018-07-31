@@ -55,6 +55,15 @@ public class Client implements OnGameStateListener {
 
     public void start() {
         while (true) {
+            for (int i = 0; i < mRemotePlayerData.size(); i++) {
+                if (mRemotePlayerData.get(i).isWudi) {
+                    mRemotePlayers.get(i).getPhysicsBody().setCollideCode(0);
+                } else {
+                    mRemotePlayers.get(i).getPhysicsBody().setCollideCode(0x1000);
+                }
+
+            }
+
             byte[] recData = new byte[5120];
             try {
                 mReceiver.read(recData);
@@ -77,30 +86,37 @@ public class Client implements OnGameStateListener {
                     mGameStarted = true;
                 } else if (message.type == NetMessage.DataType.USER_POS) {
                     //System.out.println(message.data);
-                    List<RemotePlayerData> data = mGson.fromJson(message.data, new TypeToken<ArrayList<RemotePlayerData>>(){}.getType());
+                    List<RemotePlayerData> data = mGson.fromJson(message.data,
+                            new TypeToken<ArrayList<RemotePlayerData>>() {
+                            }.getType());
                     for (int i = 0; i < mRemotePlayerData.size(); i++) {
                         RemotePlayerData d = mRemotePlayerData.get(i);
                         d.playerY = data.get(i).playerY;
                         d.playerDistance = data.get(i).playerDistance;
                         d.weaponDistance = data.get(i).weaponDistance;
+                        d.isWudi = data.get(i).isWudi;
                         d.weaponY = data.get(i).weaponY;
                         mRemotePlayers.get(i).getPhysicsBody().setPosition(
                                 new Position(d.playerDistance - mGameScene.getDistance(),
                                         d.playerY)
                         );
                     }
-                } else if(message.type == NetMessage.DataType.GAME_OVER) {
-                    List<Long> time = mGson.fromJson(message.data, new TypeToken<ArrayList<Long>>(){}.getType());
-                    for (long t:time) {
+                } else if (message.type == NetMessage.DataType.GAME_OVER) {
+                    List<Long> time = mGson.fromJson(message.data,
+                            new TypeToken<ArrayList<Long>>() {
+                            }.getType());
+                    for (long t : time) {
                         System.out.println(t);
                     }
-                    break;
+                    mGameScene.stopGame();
+                    return;
                 }
 
                 if (mGameStarted) {
                     RemotePlayerData playerData = new RemotePlayerData();
                     playerData.playerDistance = mGameScene.getDistance() + 100;
                     playerData.playerY = mPlayer.getPhysicsBody().getPosition().y;
+                    playerData.isWudi = mPlayer.isWudi();
                     String data = mGson.toJson(playerData, RemotePlayerData.class);
                     NetMessage sendMessage = new NetMessage();
                     sendMessage.type = NetMessage.DataType.USER_POS;
@@ -113,7 +129,7 @@ public class Client implements OnGameStateListener {
 
                     mSender.write(mGson.toJson(sendMessage, NetMessage.class).getBytes());
                 }
-                sleep(10);
+                sleep(5);
             } catch (Exception e) {
                 if (++mErrorsNum >= 3) {
                     break;
@@ -126,6 +142,7 @@ public class Client implements OnGameStateListener {
     public void onGameOver(long time) {
         mGameTime = time;
         mGameOver = true;
+
     }
 
     @Override

@@ -61,12 +61,16 @@ public class World {
 
                     pos.x += speed.x;
                     pos.y += speed.y;
+                    if (body.getParentSprite() instanceof Player) {
+                        if (pos.y == 0)
+                            pos.y += 1;
+                    }
                 }
 
                 try {
                     sleep(16);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    break;
                 }
             }
         });
