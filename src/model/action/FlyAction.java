@@ -2,14 +2,14 @@ package model.action;
 
 import model.Position;
 import model.Vector;
-import utils.MMath;
 
-public class FlyAction extends Action {
+public class FlyAction extends Action<Position> {
 
     private long mLastTime = 0;
 
     private Position mDestPos;
     private double mXDistance, mYDistance;
+    private double cx, cy;
 
     /**
      * 从src移动到dest
@@ -19,6 +19,8 @@ public class FlyAction extends Action {
      */
     public FlyAction(Position src, Position dest, long duration) {
         mDestPos = dest;
+        cx = src.x;
+        cy = src.y;
         mXDistance = dest.x - src.x;
         mYDistance = dest.y - src.y;
         setDuration(duration);
@@ -32,13 +34,15 @@ public class FlyAction extends Action {
      */
     public FlyAction(Position src, Vector distance, long duration) {
         mDestPos = new Position(src.x + distance.x, src.y + distance.y);
+        cx = src.x;
+        cy = src.y;
         mXDistance = distance.x;
         mYDistance = distance.y;
         setDuration(duration);
     }
 
     @Override
-    public Position getNextPosition(Position current) {
+    public Position getNext(Position current) {
         if (mPlayedCount >= 1) {
             return current;
         }
@@ -49,25 +53,19 @@ public class FlyAction extends Action {
         }
 
         long t = System.currentTimeMillis() - mLastTime;
-        int xs = (int) (mXDistance * ((double)t / getDuration()));
-        int ys = (int) (mYDistance * ((double)t / getDuration()));
+        double xs = mXDistance * ((double) t / getDuration());
+        double ys = mYDistance * ((double) t / getDuration());
 
-        System.out.println("t: " + t + ", xs: " + xs + ", ys: " + ys);
+        //System.out.println("t: " + t + ", xs: " + xs + ", ys: " + ys);
 
-        // 检查相隔时间是否足够运动
-        if (MMath.abs(xs) <= 1) {
-            if (mXDistance != 0)
-                return pos;
-        }
-        if (MMath.abs(ys) <= 1) {
-            if (mYDistance != 0)
-                return pos;
-        }
+        cx += xs;
+        cy += ys;
 
-        pos.x = pos.x + xs;
-        pos.y = pos.y + ys;
+        pos.x = (int) cx;
+        pos.y = (int) cy;
 
-        System.out.println(pos.getDistance(mDestPos) + ", " + pos.x + " " + pos.y + ", " + mDestPos.x + " " + mDestPos.y);
+        //System.out.println(pos.getDistance(mDestPos) + ", " + pos.x + " " + pos.y + ", " +
+        // mDestPos.x + " " + mDestPos.y);
         if (pos.getDistance(mDestPos) < 10) {
             mPlayedCount++;
             mLastTime = 0;

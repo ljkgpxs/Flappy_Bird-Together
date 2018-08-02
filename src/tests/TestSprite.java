@@ -12,7 +12,6 @@ import javax.swing.*;
 import model.Animator;
 import model.Position;
 import model.Sprite;
-import model.Vector;
 import model.action.FlyAction;
 
 public class TestSprite extends JFrame {
@@ -23,17 +22,15 @@ public class TestSprite extends JFrame {
         player = new Sprite();
         Animator animator = new Animator();
         try {
-            animator.addFrame(ImageIO.read(new File("resources/bird0_0.png")));
-            animator.addFrame(ImageIO.read(new File("resources/bird0_1.png")));
-            animator.addFrame(ImageIO.read(new File("resources/bird0_2.png")));
+            animator.addFrame(ImageIO.read(new File("resources/fireworks0.png")));
         } catch (IOException e) {
             e.printStackTrace();
         }
         animator.setDuration(700);
 
-        FlyAction action = new FlyAction(new Position(200, 300), new Vector(0, -30), 10000);
+        FlyAction action = new FlyAction(new Position(10, 10), new Position(100, 100), 3000);
 
-        player.setAction(action);
+        player.addAction(action);
 
         player.setAnimator(animator);
 
@@ -49,14 +46,14 @@ public class TestSprite extends JFrame {
     }
 
     class Panel extends JPanel {
-        Position pos = new Position(200, 300);
+        Position pos = new Position(10, 10);
         @Override
         public void paint(Graphics graphics) {
             super.paint(graphics);
 
-            pos = player.getAction().getNextPosition(pos);
+            pos = (Position) player.getActions().get(0).getNext(pos);
 
-            graphics.drawImage(player.getAnimator().getNextFrame(), pos.x, pos.y, null);
+            graphics.drawImage(player.getAnimator().getNextFrame(), 100, 100, pos.x, pos.y, null);
         }
 
         void start() {

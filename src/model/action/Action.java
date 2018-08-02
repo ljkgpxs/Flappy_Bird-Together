@@ -1,8 +1,6 @@
 package model.action;
 
-import model.Position;
-
-public abstract class Action {
+public abstract class Action<E> {
     private long mDuration;
 
     protected int mPlayedCount = 0;
@@ -15,7 +13,7 @@ public abstract class Action {
         this.mDuration = duration;
     }
 
-    abstract public Position getNextPosition(Position current);
+    abstract public E getNext(E current);
 
     public int getPlayedCount() {
         return mPlayedCount;
