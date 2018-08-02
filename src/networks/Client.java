@@ -19,6 +19,7 @@ import model.Sprite;
 import model.weapon.FireWeapon;
 import model.weapon.GunWeapon;
 import scenes.GameScene;
+import scenes.ResultScene;
 import utils.Map;
 
 public class Client implements OnGameStateListener, OnWeaponBulletAddListener {
@@ -135,6 +136,7 @@ public class Client implements OnGameStateListener, OnWeaponBulletAddListener {
                         System.out.println(t);
                     }
                     mGameScene.stopGame();
+                    new ResultScene(time);
                     client.close();
                     return;
                 }

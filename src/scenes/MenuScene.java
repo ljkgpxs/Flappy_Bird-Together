@@ -193,10 +193,6 @@ public class MenuScene extends Scene implements MouseListener {
                 int width = s.getPhysicsBody().getShape().getWidth();
                 int height = s.getPhysicsBody().getShape().getHeight();
 
-                if (s.hasAction()) {
-                    Position p = s.getPhysicsBody().getPosition();
-                    p = s.getAction().getNextPosition(p);
-                }
 
                 if (s.getAnimator() != null)
                     graphics.drawImage(s.getAnimator().getNextFrame(),

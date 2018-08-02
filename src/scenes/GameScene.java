@@ -20,6 +20,8 @@ import model.Pipe;
 import model.Player;
 import model.Position;
 import model.Sprite;
+import model.action.Action;
+import model.action.FlyAction;
 import model.weapon.FireWeapon;
 import model.weapon.GunWeapon;
 import model.weapon.UnlimitedWeapon;
@@ -254,8 +256,13 @@ public class GameScene extends Scene implements KeyListener {
                 int height = s.getPhysicsBody().getShape().getHeight();
 
                 if (s.hasAction()) {
-                    Position p = s.getPhysicsBody().getPosition();
-                    p = s.getAction().getNextPosition(p);
+                    for (Action a : s.getActions()) {
+                        if (a instanceof FlyAction) {
+                            Position p = s.getPhysicsBody().getPosition();
+                            p = (Position) a.getNext(p);
+                        }
+
+                    }
                 }
 
                 if (s.getAnimator() != null) {
