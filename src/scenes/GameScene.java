@@ -8,15 +8,12 @@ import java.awt.event.KeyListener;
 import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import listeners.OnGameStateListener;
-import listeners.OnWeaponBulletAddListener;
 import model.AirWall;
 import model.EndFlag;
 import model.Pipe;
@@ -132,9 +129,19 @@ public class GameScene extends Scene implements KeyListener {
                     }
                 } else {
                     mDistance += mRunSpeed;
+                    for (Sprite s : mSprites) {
+                        if (s.getPhysicsBody() != null) {
+                            if (s.getPhysicsBody().isFixed() && !(s instanceof AirWall)) {
+                                Position p = s.getPhysicsBody().getPosition();
+                                p.x -= mRunSpeed;
+                            }
+                        }
+                    }
                 }
-                mScreen.repaint();
-                Toolkit.getDefaultToolkit().sync();
+                mScreen.paintImmediately(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+                if (System.getProperty("os.name").equalsIgnoreCase("linux")) {
+                    Toolkit.getDefaultToolkit().sync();
+                }
                 try {
                     long dt = TIME_PRE_FRAME + t - System.currentTimeMillis();
                     sleep(dt > 0 ? dt : 0);
@@ -225,10 +232,6 @@ public class GameScene extends Scene implements KeyListener {
                     null);
 
             for (Sprite s : mSprites) {
-                s.paint(graphics);
-            }
-
-            for (Sprite s : mSprites) {
 
                 if (!s.isEnable()) {
                     continue;
@@ -254,7 +257,7 @@ public class GameScene extends Scene implements KeyListener {
                             y + image.getHeight(null) / 2);
                     if (s.getPhysicsBody().isFixed()) {
                         graphics.drawImage(image,
-                                s.getPhysicsBody().getPosition().x -= mRunSpeed,
+                                s.getPhysicsBody().getPosition().x,
                                 s.getPhysicsBody().getPosition().y,
                                 width, height, null);
                     } else {
@@ -271,6 +274,10 @@ public class GameScene extends Scene implements KeyListener {
                     }
                 }
                 g2d.setTransform(old);
+            }
+
+            for (Sprite s : mSprites) {
+                s.paint(graphics);
             }
 
             graphics.drawImage(mLandImage,

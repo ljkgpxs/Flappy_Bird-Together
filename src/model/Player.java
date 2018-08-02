@@ -13,7 +13,6 @@ import listeners.OnWeaponBulletAddListener;
 import model.weapon.FireWeapon;
 import model.weapon.GunWeapon;
 import model.weapon.UnlimitedWeapon;
-import model.weapon.Weapon;
 import physics.PhysicsBody;
 import physics.shape.CircleShape;
 import scenes.GameScene;
@@ -260,61 +259,62 @@ public class Player extends Sprite {
         mPhysicsBody.setAngle(degree);
 
         graphics.drawImage(mSkillSpeedUp,
-                180, 30,
+                260, 30,
                 60, 60,
                 null);
         graphics.drawImage(mWeaponSlot,
-                260, 30,
+                180, 30,
                 60, 60,
                 null);
         if (System.currentTimeMillis() - mSkillSpeedUpTimer < 5000) {
             graphics.drawImage(mSkillLoading,
-                    180, 30,
+                    260, 30,
                     60, 60,
                     null);
             //graphics.setFont(new Font(new File("resources/fonts/arial.ttf"), ));
             try {
                 graphics.setFont(Font.createFont(Font.TRUETYPE_FONT,
                         new File("resources/fonts/Marker Felt.ttf")));
-                graphics.setFont(new Font("Marker Felt", Font.BOLD, 36));
+                graphics.setFont(new Font("Marker Felt", Font.BOLD, 30));
             } catch (FontFormatException | IOException e) {
                 e.printStackTrace();
             }
             graphics.setColor(Color.WHITE);
-            graphics.drawString("" + (5 - (System.currentTimeMillis() - mSkillSpeedUpTimer) / 1000),
-                    197, 73);
+            graphics.drawString(String.format("%.1f",
+                    5 - (System.currentTimeMillis() - mSkillSpeedUpTimer) / 1000.0),
+                    265, 73);
         } else {
             graphics.setFont(new Font("宋体", Font.BOLD, 14));
-            graphics.drawString("K", 180, 30);
+            graphics.drawString("K", 260, 30);
         }
 
         if (mWeaponType == WeaponType.FIRE) {
             graphics.drawImage(mFireImage,
-                    270, 45,
+                    190, 45,
                     40, 28, null);
         }
 
         if (mWeaponType == WeaponType.GUN) {
             graphics.drawImage(mGunImage,
-                    270, 50,
+                    190, 50,
                     35, 25, null);
         }
         graphics.setColor(Color.BLACK);
         graphics.setFont(new Font("宋体", Font.BOLD, 14));
-        graphics.drawString("J", 260, 30);
+        graphics.drawString("J", 180, 30);
         long t = isWeaponReady();
         if (t > 0) {
             if (t == Long.MAX_VALUE || t < 300000) {
                 graphics.drawImage(mSkillLoading,
-                        260, 30,
+                        180, 30,
                         60, 60,
                         null);
             }
-            graphics.setFont(new Font("宋体", Font.BOLD, 36));
+            graphics.setFont(new Font("宋体", Font.BOLD, 30));
             if (t < 300000) {
                 graphics.setColor(Color.WHITE);
-                graphics.drawString(String.valueOf(t / 1000),
-                        277, 73);
+                graphics.drawString(String.format("%.1f", t / 1000.0),
+                        182, 73);
             }
         }
 

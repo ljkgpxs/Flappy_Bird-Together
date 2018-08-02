@@ -44,7 +44,7 @@ public class GunWeapon extends Weapon {
     }
 
     public static long getLoadTime() {
-        return 2000;
+        return 1500;
     }
 
     public static Sprite getBullet() {

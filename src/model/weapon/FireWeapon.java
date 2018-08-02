@@ -3,7 +3,6 @@ package model.weapon;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 
 import javax.imageio.ImageIO;
 
@@ -12,7 +11,6 @@ import model.Position;
 import model.Sprite;
 import model.Vector;
 import physics.PhysicsBody;
-import physics.shape.CircleShape;
 import physics.shape.RectangleShape;
 
 /**
@@ -47,7 +45,7 @@ public class FireWeapon extends Weapon {
     }
 
     public static long getLoadTime() {
-        return 1500;
+        return 1000;
     }
 
     public static Sprite getBullet() {
