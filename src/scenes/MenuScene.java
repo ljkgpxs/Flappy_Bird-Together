@@ -3,8 +3,6 @@ package scenes;
 import static java.lang.Thread.sleep;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
@@ -21,10 +19,9 @@ import model.Vector;
 import networks.Server;
 import networks.broadcast.ServerBroadcast;
 import physics.PhysicsBody;
-import physics.World;
 import physics.shape.CircleShape;
-import physics.shape.RectangleShape;
 import scenes.core.Scene;
+import utils.AudioPlay;
 
 public class MenuScene extends Scene implements MouseListener {
     private final static int WINDOW_WIDTH = 1280;
@@ -58,6 +55,7 @@ public class MenuScene extends Scene implements MouseListener {
     }
 
     public void start() {
+        AudioPlay.playSound("resources/sounds/bgm1.wav");
         this.setVisible(true);
         new Thread(() -> {
             long t;

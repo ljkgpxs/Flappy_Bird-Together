@@ -6,8 +6,6 @@ import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -18,6 +16,7 @@ import networks.broadcast.IpPort;
 import networks.broadcast.ServerBroadcast;
 import networks.broadcast.ServerScanner;
 import scenes.core.Scene;
+import utils.AudioPlay;
 
 public class RoomScene extends Scene {
 
@@ -44,6 +43,7 @@ public class RoomScene extends Scene {
                 public void mouseClicked(MouseEvent mouseEvent) {
                     mClient = new Client(mIpPort.getAddress().getHostAddress(), mIpPort.getPort());
                     ServerBroadcast.stopBroadcast();
+                    AudioPlay.stopAll();
                     new Thread(mClient::start).start();
                     server.setStartGame(true);
                     dispose();
@@ -84,6 +84,7 @@ public class RoomScene extends Scene {
                     new Thread(mClient::start).start();
                     mJLabel.setText("等待开始");
                     mStartButton.setEnabled(false);
+                    AudioPlay.stopAll();
                     dispose();
                 }
 

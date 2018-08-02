@@ -16,6 +16,7 @@ import model.weapon.UnlimitedWeapon;
 import physics.PhysicsBody;
 import physics.shape.CircleShape;
 import scenes.GameScene;
+import utils.AudioPlay;
 import utils.WeaponType;
 
 public class Player extends Sprite {
@@ -73,6 +74,7 @@ public class Player extends Sprite {
             return;
         }
         if (event.getKeyCode() == KeyEvent.VK_SPACE) {
+            AudioPlay.playSound("resources/sounds/fly.wav");
             if (mPhysicsBody.getPosition().y
                     < GameScene.WINDOW_HEIGHT - 112 - mPhysicsBody.getShape().getHeight()) {
                 mPhysicsBody.setSpeed(new Vector(0, -5));
@@ -98,6 +100,13 @@ public class Player extends Sprite {
                 return;
             }
 
+            if (mWeaponType == WeaponType.FIRE) {
+                AudioPlay.playSound("resources/sounds/fire.wav");
+            } else {
+                AudioPlay.playSound("resources/sounds/gun.wav");
+            }
+
+
             mWeaponTimer = System.currentTimeMillis();
             if (mOnWeaponBulletAddListener != null) {
                 bullet.getPhysicsBody().setPosition(
@@ -114,6 +123,7 @@ public class Player extends Sprite {
         if (System.currentTimeMillis() - mSkillSpeedUpTimer < 5000) {
             return;
         }
+        AudioPlay.playSound("resources/sounds/wind.wav");
         mSkillSpeedUpTimer = System.currentTimeMillis();
         new Thread(() -> {
             try {
@@ -141,11 +151,12 @@ public class Player extends Sprite {
 
         if (a instanceof UnlimitedWeapon) {
             new Thread(() -> {
+                AudioPlay.playSound("resources/sounds/star.wav");
                 mWudi = true;
-                GameScene.mRunSpeed = 7.0;
+                GameScene.mRunSpeed = 8.0;
                 mPhysicsBody.setCollideCode(0x10);
                 try {
-                    sleep(4000);
+                    sleep(10000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -168,14 +179,9 @@ public class Player extends Sprite {
             return true;
         }
 
-        if (a instanceof GunWeapon.GunBullet) {
+        if (a instanceof GunWeapon.GunBullet || a instanceof FireWeapon.FireBullet) {
             System.out.println("i am shot");
-            punishTime();
-            return true;
-        }
-
-        if (a instanceof FireWeapon.FireBullet) {
-            System.out.println("I am shot in Fire");
+            AudioPlay.playSound("resources/sounds/ao.wav");
             punishTime();
             return true;
         }

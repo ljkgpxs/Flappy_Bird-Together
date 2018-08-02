@@ -25,6 +25,7 @@ import model.weapon.GunWeapon;
 import model.weapon.UnlimitedWeapon;
 import physics.World;
 import scenes.core.Scene;
+import utils.AudioPlay;
 import utils.MMath;
 import utils.Map;
 import utils.SpriteType;
@@ -106,8 +107,16 @@ public class GameScene extends Scene implements KeyListener {
             mGameTime = System.currentTimeMillis();
             mRunSpeed = 0.0;
             try {
-                sleep(4000);
+                AudioPlay.playSound("resources/sounds/du.wav");
+                sleep(1000);
+                AudioPlay.playSound("resources/sounds/du.wav");
+                sleep(1000);
+                AudioPlay.playSound("resources/sounds/du.wav");
+                sleep(1000);
+                AudioPlay.playSound("resources/sounds/du1.wav");
+                sleep(1000);
                 mGameReady = false;
+                AudioPlay.playMusic("resources/sounds/bgm2.wav", 10);
                 mWorld.run();
                 mRunSpeed = 2.0;
             } catch (InterruptedException e) {
@@ -174,6 +183,7 @@ public class GameScene extends Scene implements KeyListener {
     }
 
     public void stopGame() {
+        AudioPlay.stopAll();
         mStopGame = true;
         mWorld.stopEmulator();
         dispose();
