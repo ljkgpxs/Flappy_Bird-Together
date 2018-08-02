@@ -24,6 +24,7 @@ public class ServerScanner {
                 Gson gson = new Gson();
                 BroadcastMessage rec = gson.fromJson(message, BroadcastMessage.class);
                 if (rec.msg.equalsIgnoreCase(SERVER_MESSAGE)) {
+                    socket.close();
                     return new IpPort(recPacket.getAddress(), rec.port);
                 }
             }
