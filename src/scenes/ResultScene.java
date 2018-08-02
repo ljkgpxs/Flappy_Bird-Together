@@ -7,6 +7,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -20,13 +21,14 @@ import model.Sprite;
 import model.action.Action;
 import model.action.FlyAction;
 import model.action.ScaleAction;
+import networks.ScoreItem;
 import physics.PhysicsBody;
 import physics.shape.RectangleShape;
 import scenes.core.Scene;
 import utils.AudioPlay;
 
 public class ResultScene extends Scene implements MouseListener {
-    private List<Long> mUserTime;
+    private List<ScoreItem> mUserTime;
 
     private int mRunSpeed = 1;
     private Screen mScreen;
@@ -38,13 +40,13 @@ public class ResultScene extends Scene implements MouseListener {
 
     private boolean mBoardLoaded = false;
 
-    public ResultScene(List<Long> userTime) {
+    public ResultScene(List<ScoreItem> userTime) {
         mUserTime = userTime;
         mScreen = new Screen();
         mSprites = new CopyOnWriteArrayList<>();
         mResult = new CopyOnWriteArrayList<>();
 
-        userTime.sort(Long::compareTo);
+        userTime.sort(Comparator.comparing(scoreItem -> scoreItem.time));
 
 
         this.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -112,10 +114,12 @@ public class ResultScene extends Scene implements MouseListener {
                     buffer.append(": ");
                     mResult.set(i, buffer.toString());
                     sleep(1000);
-                    buffer.append(String.format("%.2f", mUserTime.get(i) / 1000.0));
+                    buffer.append(String.format("%.2f", mUserTime.get(i).time / 1000.0));
                     mResult.set(i, buffer.toString());
                     sleep(400);
                     buffer.append("秒");
+                    sleep(400);
+                    buffer.append("    \t" + mUserTime.get(i).tag);
                     mResult.set(i, buffer.toString());
                     sleep(400);
                     if (i == 0) {
@@ -220,7 +224,7 @@ public class ResultScene extends Scene implements MouseListener {
                         s.getPhysicsBody().getShape().getHeight(), null);
 
 
-                graphics.setFont(new Font("黑体", Font.BOLD, 28));
+                graphics.setFont(new Font("黑体", Font.BOLD, 20));
                 graphics.setColor(Color.WHITE);
                 for (int i = 0; i < mResult.size(); i++) {
                     graphics.drawString(mResult.get(i), 500, 150 + i * 60);

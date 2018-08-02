@@ -64,6 +64,7 @@ public class Client implements OnGameStateListener, OnWeaponBulletAddListener {
         mHandledWeaponId = new ArrayList<>();
 
         mPlayer.setOnWeaponBulletAddListener(this);
+        mPlayer.setTag(System.getProperty("user.name"));
     }
 
     public void start() {
@@ -131,10 +132,10 @@ public class Client implements OnGameStateListener, OnWeaponBulletAddListener {
                         }
                     }
                 } else if (message.type == NetMessage.DataType.GAME_OVER) {
-                    List<Long> time = mGson.fromJson(message.data,
-                            new TypeToken<ArrayList<Long>>() {
+                    List<ScoreItem> time = mGson.fromJson(message.data,
+                            new TypeToken<ArrayList<ScoreItem>>() {
                             }.getType());
-                    for (long t : time) {
+                    for (ScoreItem t : time) {
                         System.out.println(t);
                     }
                     mGameScene.stopGame();
@@ -169,6 +170,7 @@ public class Client implements OnGameStateListener, OnWeaponBulletAddListener {
                     if (mGameOver) {
                         sendMessage.gameOver = true;
                         sendMessage.time = mGameTime;
+                        sendMessage.tag = System.getProperty("user.name");
                     }
 
                     mSender.write(mGson.toJson(sendMessage, NetMessage.class).getBytes());

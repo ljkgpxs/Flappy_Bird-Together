@@ -6,6 +6,8 @@ public class NetMessage {
     boolean gameOver;
     long time;
 
+    String tag;
+
     enum DataType {
         USER_POS, // 发送位置数据
         MAP_DATA, // 发送地图数据

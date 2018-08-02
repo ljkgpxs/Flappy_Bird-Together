@@ -26,7 +26,7 @@ public class Server {
     private List<Boolean> mStartGame;
     private List<Boolean> mGameStarted;
     private List<Boolean> mGameOver;
-    private List<Long> mGameTime;
+    private List<ScoreItem> mGameTime;
 
     private List<Thread> mHandlers;
 
@@ -60,7 +60,7 @@ public class Server {
                 try {
                     Socket socket = mServerSocket.accept();
                     mGameStarted.add(false);
-                    mGameTime.add(Long.MAX_VALUE);
+                    mGameTime.add(new ScoreItem());
                     mGameOver.add(false);
                     mStartGame.add(false);
                     mClientList.add(socket);
@@ -135,7 +135,8 @@ public class Server {
                                     mGson.fromJson(clientMessage.data, RemotePlayerData.class));
                             if (clientMessage.gameOver) {
                                 mGameOver.set(id, true);
-                                mGameTime.set(id, clientMessage.time);
+                                mGameTime.set(id,
+                                        new ScoreItem(clientMessage.tag, clientMessage.time));
                             }
                             //System.out.println("Got " + id + " position " + clientMessage.data);
                         } else {
