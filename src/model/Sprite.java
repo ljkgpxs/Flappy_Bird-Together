@@ -3,13 +3,15 @@ package model;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import model.action.Action;
 import model.weapon.Weapon;
 import physics.PhysicsBody;
 
 public class Sprite {
-    private Action mAction = null;
+    private List<Action> mActions = null;
     protected Animator mAnimator = null;
     protected PhysicsBody mPhysicsBody = null;
     private Weapon mWeapon = null;
@@ -20,12 +22,16 @@ public class Sprite {
 
     private String mTag = "";
 
-    public Action getAction() {
-        return mAction;
+    public List<Action> getActions() {
+        return mActions;
     }
 
-    public void setAction(Action action) {
-        mAction = action;
+    public Sprite() {
+        mActions = new CopyOnWriteArrayList<>();
+    }
+
+    public void addAction(Action action) {
+        mActions.add(action);
     }
 
     public Animator getAnimator() {
@@ -54,9 +60,7 @@ public class Sprite {
     }
 
     public boolean hasAction() {
-        if (mAction != null && mAction.getPlayedCount() == 0)
-            return true;
-        else return false;
+        return mActions.size() != 0;
     }
 
     public boolean isEnable() {
