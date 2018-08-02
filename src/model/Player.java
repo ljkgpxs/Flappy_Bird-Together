@@ -153,7 +153,7 @@ public class Player extends Sprite {
             new Thread(() -> {
                 AudioPlay.playSound("resources/sounds/star.wav");
                 mWudi = true;
-                GameScene.mRunSpeed = 8.0;
+                GameScene.mRunSpeed = 7.0;
                 mPhysicsBody.setCollideCode(0x10);
                 try {
                     sleep(10000);

@@ -1,6 +1,5 @@
 package utils;
 
-import java.awt.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +41,7 @@ public class Map implements Serializable {
         Random random = new Random();
 
         Map map = new Map();
-        map.mMapLength = 7000 + random.nextInt(2000);
+        map.mMapLength = 8000 + random.nextInt(2000);
         for (int i = 1; i < map.mMapLength; i++) {
             if (i % 500 == 0) {
                 Position position = new Position(i, 0);

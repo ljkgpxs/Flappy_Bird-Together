@@ -10,6 +10,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
+import listeners.OnGameStateListener;
 import networks.Client;
 import networks.Server;
 import networks.broadcast.IpPort;
@@ -18,7 +19,7 @@ import networks.broadcast.ServerScanner;
 import scenes.core.Scene;
 import utils.AudioPlay;
 
-public class RoomScene extends Scene {
+public class RoomScene extends Scene implements OnGameStateListener {
 
     private JLabel mJLabel;
     private JLabel mStartButton;
@@ -41,7 +42,6 @@ public class RoomScene extends Scene {
             mStartButton.addMouseListener(new MouseListener() {
                 @Override
                 public void mouseClicked(MouseEvent mouseEvent) {
-                    mClient = new Client(mIpPort.getAddress().getHostAddress(), mIpPort.getPort());
                     ServerBroadcast.stopBroadcast();
                     AudioPlay.stopAll();
                     new Thread(mClient::start).start();
@@ -84,8 +84,7 @@ public class RoomScene extends Scene {
                     new Thread(mClient::start).start();
                     mJLabel.setText("等待开始");
                     mStartButton.setEnabled(false);
-                    AudioPlay.stopAll();
-                    dispose();
+                    mClient.setOnGameStateListener(RoomScene.this);
                 }
 
                 @Override
@@ -126,9 +125,23 @@ public class RoomScene extends Scene {
         setTitle("房间搜索");
         new Thread(() -> {
             mIpPort =  ServerScanner.scan();
+            if (isMaster) {
+                mClient = new Client(mIpPort.getAddress().getHostAddress(), mIpPort.getPort());
+            }
             mJLabel.setText("房间地址: " + mIpPort.getAddress().getHostAddress() + ":" + mIpPort.getPort());
             mStartButton.setEnabled(true);
         }).start();
+    }
+
+    @Override
+    public void onGameOver(long time) {
+
+    }
+
+    @Override
+    public void onGameStart() {
+        AudioPlay.stopAll();
+        dispose();
     }
 
     class BackImage extends JPanel {

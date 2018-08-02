@@ -3,6 +3,8 @@ package scenes;
 import static java.lang.Thread.sleep;
 
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -21,8 +23,9 @@ import model.action.ScaleAction;
 import physics.PhysicsBody;
 import physics.shape.RectangleShape;
 import scenes.core.Scene;
+import utils.AudioPlay;
 
-public class ResultScene extends Scene {
+public class ResultScene extends Scene implements MouseListener {
     private List<Long> mUserTime;
 
     private int mRunSpeed = 1;
@@ -51,6 +54,7 @@ public class ResultScene extends Scene {
         this.setResizable(false);
         this.add(mScreen);
         this.setVisible(true);
+        this.addMouseListener(this);
 
         addSprite(new Fireworks());
         addSprite(new Fireworks());
@@ -63,6 +67,8 @@ public class ResultScene extends Scene {
         addSprite(new Fireworks());
 
         addSprite(new ScoreBoard());
+
+        AudioPlay.playMusic("resources/sounds/bgm3.wav", 10);
 
         new Thread(() -> {
             while (true) {
@@ -121,6 +127,31 @@ public class ResultScene extends Scene {
                 }
             }
         }).start();
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent mouseEvent) {
+        System.exit(0);
+    }
+
+    @Override
+    public void mousePressed(MouseEvent mouseEvent) {
+
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent mouseEvent) {
+
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent mouseEvent) {
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent mouseEvent) {
+
     }
 
     class Screen extends JPanel {

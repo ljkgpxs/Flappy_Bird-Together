@@ -38,6 +38,8 @@ public class Client implements OnGameStateListener, OnWeaponBulletAddListener {
 
     private List<String> mHandledWeaponId;
 
+    private OnGameStateListener mOnGameStateListener;
+
     private Sprite mWeaponBullet;
     private int mWeaponId;
 
@@ -188,7 +190,9 @@ public class Client implements OnGameStateListener, OnWeaponBulletAddListener {
 
     @Override
     public void onGameStart() {
-
+        if (mOnGameStateListener != null) {
+            new Thread(mOnGameStateListener::onGameStart).start();
+        }
     }
 
     @Override
@@ -196,5 +200,9 @@ public class Client implements OnGameStateListener, OnWeaponBulletAddListener {
         mGameScene.addSprite(sprite);
         mWeaponBullet = sprite;
         mWeaponId++;
+    }
+
+    public void setOnGameStateListener(OnGameStateListener onGameStateListener) {
+        mOnGameStateListener = onGameStateListener;
     }
 }
