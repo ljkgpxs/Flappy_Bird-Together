@@ -12,6 +12,10 @@ public abstract class Scene extends JFrame {
     protected final static int FPS = 30;
     protected final static int TIME_PRE_FRAME = 1000 / FPS;
 
+    public Scene() {
+        setIconImage(new ImageIcon("resources/logo.png").getImage());
+    }
+
     public void addSprite(Sprite sprite) {
         mSprites.add(sprite);
     }
