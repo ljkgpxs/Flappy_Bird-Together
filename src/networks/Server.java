@@ -10,6 +10,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
+import listeners.OnPlayerJoinedListener;
 import utils.Map;
 
 public class Server {
@@ -33,6 +34,8 @@ public class Server {
     private Thread mAcceptThread;
 
     private Gson mGson;
+
+    private OnPlayerJoinedListener mPlayerJoinedListener;
 
     public Server(int port) {
         mPort = port;
@@ -66,6 +69,9 @@ public class Server {
                     mClientList.add(socket);
                     mClientsPosition.add(new RemotePlayerData());
                     System.out.println("Got a client");
+                    if (mPlayerJoinedListener != null) {
+                        mPlayerJoinedListener.onPlayerJoined(mClientList.size());
+                    }
                     mHandlers.add(new Thread(new Handler(socket, i)));
                     mHandlers.get(i).start();
                     i++;
@@ -82,6 +88,10 @@ public class Server {
         for (int i = 0; i < mStartGame.size(); i++) {
             mStartGame.set(i, true);
         }
+    }
+
+    public void setOnPlayerJoinedListener(OnPlayerJoinedListener playerJoinedListener) {
+        mPlayerJoinedListener = playerJoinedListener;
     }
 
     class Handler implements Runnable {

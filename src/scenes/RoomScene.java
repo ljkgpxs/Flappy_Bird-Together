@@ -11,6 +11,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import listeners.OnGameStateListener;
+import listeners.OnPlayerJoinedListener;
 import networks.Client;
 import networks.Server;
 import networks.broadcast.IpPort;
@@ -19,15 +20,25 @@ import networks.broadcast.ServerScanner;
 import scenes.core.Scene;
 import utils.AudioPlay;
 
-public class RoomScene extends Scene implements OnGameStateListener {
+public class RoomScene extends Scene implements OnGameStateListener, OnPlayerJoinedListener {
 
     private JLabel mJLabel;
     private JLabel mStartButton;
+    private JLabel mPlayerCount;
 
     private IpPort mIpPort;
     private Client mClient;
 
     public RoomScene(boolean isMaster, Server server) {
+        if (isMaster) {
+            mPlayerCount = new JLabel("当前玩家数量: 0");
+            mPlayerCount.setFont(new Font("宋体", Font.BOLD, 16));
+            mPlayerCount.setForeground(Color.ORANGE);
+            mPlayerCount.setBounds(100, 180, 300, 40);
+            this.add(mPlayerCount);
+            server.setOnPlayerJoinedListener(this);
+        }
+
         mJLabel = new JLabel("正在搜索房间...");
         mJLabel.setFont(new Font("宋体", Font.BOLD, 16));
         mJLabel.setForeground(Color.ORANGE);
@@ -142,6 +153,11 @@ public class RoomScene extends Scene implements OnGameStateListener {
     public void onGameStart() {
         AudioPlay.stopAll();
         dispose();
+    }
+
+    @Override
+    public void onPlayerJoined(int count) {
+        mPlayerCount.setText("当前玩家数量: " + count);
     }
 
     class BackImage extends JPanel {
