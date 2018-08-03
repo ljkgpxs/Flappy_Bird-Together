@@ -59,15 +59,34 @@ public class ResultScene extends Scene implements MouseListener {
         this.setVisible(true);
         this.addMouseListener(this);
 
-        addSprite(new Fireworks());
-        addSprite(new Fireworks());
-        addSprite(new Fireworks());
-        addSprite(new Fireworks());
-        addSprite(new Fireworks());
-        addSprite(new Fireworks());
-        addSprite(new Fireworks());
-        addSprite(new Fireworks());
-        addSprite(new Fireworks());
+
+        new Thread(() -> {
+            try {
+                sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            while (true) {
+                if (mIsOver) {
+                    break;
+                }
+                List<Sprite> sprites = new CopyOnWriteArrayList<>();
+                for (int i = 0; i < 9; i++) {
+                    Sprite s = new Fireworks();
+                    sprites.add(s);
+                    addSprite(s);
+                }
+                try {
+                    sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                for (int i = 0; i < 9; i++) {
+                    removeSprite(sprites.get(i));
+                }
+                sprites.clear();
+            }
+        }).start();
 
         addSprite(new ScoreBoard());
 
@@ -122,12 +141,12 @@ public class ResultScene extends Scene implements MouseListener {
                     buffer.append(": ");
                     mResult.set(i, buffer.toString());
                     sleep(1000);
-                    buffer.append(String.format("%.2f", mUserTime.get(i).time / 1000.0));
+                    buffer.append(String.format("%7.2f", mUserTime.get(i).time / 1000.0));
                     mResult.set(i, buffer.toString());
                     sleep(400);
                     buffer.append("秒");
                     sleep(400);
-                    buffer.append("    " + mUserTime.get(i).tag);
+                    buffer.append("    ").append(mUserTime.get(i).tag);
                     mResult.set(i, buffer.toString());
                     sleep(400);
                     if (i == 0) {
@@ -166,6 +185,10 @@ public class ResultScene extends Scene implements MouseListener {
     @Override
     public void mouseExited(MouseEvent mouseEvent) {
 
+    }
+
+    private void removeSprite(Sprite s) {
+        mSprites.remove(s);
     }
 
     class Screen extends JPanel {
@@ -232,14 +255,12 @@ public class ResultScene extends Scene implements MouseListener {
                         s.getPhysicsBody().getPosition().y,
                         s.getPhysicsBody().getShape().getWidth(),
                         s.getPhysicsBody().getShape().getHeight(), null);
+            }
 
-
-                graphics.setFont(new Font("黑体", Font.BOLD, 20));
-                graphics.setColor(Color.WHITE);
-                for (int i = 0; i < mResult.size(); i++) {
-                    graphics.drawString(mResult.get(i), 500, 150 + i * 60);
-                }
-                //graphics.drawString("第1名用时: 10.23秒", 500, 150);
+            graphics.setFont(new Font("黑体", Font.BOLD, 20));
+            graphics.setColor(Color.WHITE);
+            for (int i = 0; i < mResult.size(); i++) {
+                graphics.drawString(mResult.get(i), 500, 150 + i * 60);
             }
         }
     }

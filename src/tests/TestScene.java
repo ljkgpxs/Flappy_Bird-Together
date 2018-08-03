@@ -11,7 +11,7 @@ public class TestScene {
 
         List<ScoreItem> longs = new CopyOnWriteArrayList<>();
         longs.add(new ScoreItem("ljkgpxs", 100021));
-        longs.add(new ScoreItem("zt", 1203));
+        longs.add(new ScoreItem("asdasdasdasd", 1203));
         longs.add(new ScoreItem("as", 212));
         new ResultScene(longs);
     }
