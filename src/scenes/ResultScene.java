@@ -39,6 +39,7 @@ public class ResultScene extends Scene implements MouseListener {
     private final static int WINDOW_HEIGHT = 720;
 
     private boolean mBoardLoaded = false;
+    private boolean mIsOver = false;
 
     public ResultScene(List<ScoreItem> userTime) {
         mUserTime = userTime;
@@ -74,6 +75,10 @@ public class ResultScene extends Scene implements MouseListener {
 
         new Thread(() -> {
             while (true) {
+                if (mIsOver) {
+                    dispose();
+                    break;
+                }
                 repaint();
                 if (System.getProperty("os.name").equalsIgnoreCase("linux")) {
                     Toolkit.getDefaultToolkit().sync();
@@ -95,6 +100,9 @@ public class ResultScene extends Scene implements MouseListener {
             }
             for (int i = 0; i < mUserTime.size(); i++) {
                 try {
+                    if (mIsOver) {
+                        return;
+                    }
                     sleep(500);
                     StringBuffer buffer = new StringBuffer("");
                     mResult.add(buffer.toString());
@@ -119,7 +127,7 @@ public class ResultScene extends Scene implements MouseListener {
                     sleep(400);
                     buffer.append("秒");
                     sleep(400);
-                    buffer.append("    \t" + mUserTime.get(i).tag);
+                    buffer.append("    " + mUserTime.get(i).tag);
                     mResult.set(i, buffer.toString());
                     sleep(400);
                     if (i == 0) {
@@ -135,7 +143,9 @@ public class ResultScene extends Scene implements MouseListener {
 
     @Override
     public void mouseClicked(MouseEvent mouseEvent) {
-        System.exit(0);
+        mIsOver = true;
+        AudioPlay.stopAll();
+        new MenuScene().start();
     }
 
     @Override
