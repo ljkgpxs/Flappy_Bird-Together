@@ -311,8 +311,8 @@ public class GameScene extends Scene implements KeyListener {
                 graphics.drawImage(mReadyImage,
                         (WINDOW_WIDTH - 400) / 2, (WINDOW_HEIGHT - 300) / 2,
                         400, 130, null);
-                graphics.drawImage(mReadyNumbers[MMath.abs(
-                        (int) (3 - (System.currentTimeMillis() - mGameTime) / 1000))],
+                int n = MMath.abs((int) (3 - (System.currentTimeMillis() - mGameTime) / 1000));
+                graphics.drawImage(mReadyNumbers[n > 3 ? 3 : n],
                         (WINDOW_WIDTH - 36) / 2, 350,
                         36, 42, null);
             }

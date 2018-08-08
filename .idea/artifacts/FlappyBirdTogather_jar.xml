@@ -3,11 +3,11 @@
     <output-path>$PROJECT_DIR$/out/artifacts/FlappyBirdTogather_jar</output-path>
     <root id="root">
       <element id="archive" name="FlappyBirdTogather.jar">
-        <element id="module-output" name="FlappyBirdTogather" />
+        <element id="module-output" name="FlappyBirdTogether" />
+        <element id="extracted-dir" path="$PROJECT_DIR$/../FlappyBirdTogether/FlappyBirdTogather/lib/gson-2.8.5.jar" path-in-jar="/" />
       </element>
-      <element id="library" level="project" name="com.google.code.gson:gson:2.8.5" />
       <element id="directory" name="resources">
-        <element id="dir-copy" path="$PROJECT_DIR$/resources" />
+        <element id="dir-copy" path="$PROJECT_DIR$/../FlappyBirdTogether/FlappyBirdTogather/resources" />
       </element>
     </root>
   </artifact>
