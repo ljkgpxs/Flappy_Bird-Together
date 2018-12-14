@@ -82,7 +82,7 @@ public class GameScene extends Scene implements KeyListener {
 
         this.addSprite(new EndFlag(new Position(map.mMapLength + 100, WINDOW_HEIGHT - 112 - 520)));
 
-        this.addSprite(new AirWall(new Position(0, -112)));
+        this.addSprite(new AirWall(new Position(0, -AirWall.WALL_HEIGHT)));
         this.addSprite(new AirWall(new Position(0, WINDOW_HEIGHT - 112)));
 
 
