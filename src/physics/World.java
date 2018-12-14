@@ -1,24 +1,16 @@
 package physics;
 
-import static java.lang.Thread.sleep;
-
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import model.Player;
 import model.Position;
 import model.Vector;
-import model.weapon.GunWeapon;
 import physics.shape.CircleShape;
 import utils.MMath;
 
-public class World {
+public class World extends Thread {
     private double mGravity;
     private List<PhysicsBody> mComponents;
-
-    private Thread mEmulatorThread;
 
     /**
      * 创建世界, 默认重力为10.0
@@ -44,11 +36,8 @@ public class World {
         mComponents.add(body);
     }
 
-    /**
-     * 开始对世界进行模拟
-     */
+    @Override
     public void run() {
-        mEmulatorThread = new Thread(() -> {
             while (true) {
                 handleCollide();
                 for (PhysicsBody body : mComponents) {
@@ -85,13 +74,18 @@ public class World {
                     break;
                 }
             }
-        });
+    }
 
-        mEmulatorThread.start();
+    /**
+     * 开始对世界进行模拟
+     */
+    @Override
+    public synchronized void start() {
+        super.start();
     }
 
     public void stopEmulator() {
-        mEmulatorThread.interrupt();
+        this.interrupt();
     }
 
     private void handleCollide() {

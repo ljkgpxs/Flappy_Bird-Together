@@ -13,7 +13,7 @@ import java.util.List;
 import listeners.OnPlayerJoinedListener;
 import utils.Map;
 
-public class Server {
+public class Server implements Runnable {
 
     private int mPort;
 
@@ -55,32 +55,35 @@ public class Server {
         }
     }
 
-    public void start() {
-        mAcceptThread =new Thread(() -> {
-            int i = 0;
-            while (true) {
+    @Override
+    public void run() {
+        int i = 0;
+        while (true) {
 
-                try {
-                    Socket socket = mServerSocket.accept();
-                    mGameStarted.add(false);
-                    mGameTime.add(new ScoreItem());
-                    mGameOver.add(false);
-                    mStartGame.add(false);
-                    mClientList.add(socket);
-                    mClientsPosition.add(new RemotePlayerData());
-                    System.out.println("Got a client");
-                    if (mPlayerJoinedListener != null) {
-                        mPlayerJoinedListener.onPlayerJoined(mClientList.size());
-                    }
-                    mHandlers.add(new Thread(new Handler(socket, i)));
-                    mHandlers.get(i).start();
-                    i++;
-                } catch (IOException e) {
-                    //e.printStackTrace();
-                    break;
+            try {
+                Socket socket = mServerSocket.accept();
+                mGameStarted.add(false);
+                mGameTime.add(new ScoreItem());
+                mGameOver.add(false);
+                mStartGame.add(false);
+                mClientList.add(socket);
+                mClientsPosition.add(new RemotePlayerData());
+                System.out.println("Got a client");
+                if (mPlayerJoinedListener != null) {
+                    mPlayerJoinedListener.onPlayerJoined(mClientList.size());
                 }
+                mHandlers.add(new Thread(new Handler(socket, i)));
+                mHandlers.get(i).start();
+                i++;
+            } catch (IOException e) {
+                //e.printStackTrace();
+                break;
             }
-        });
+        }
+    }
+
+    public void start() {
+        mAcceptThread = new Thread(this);
         mAcceptThread.start();
     }
 

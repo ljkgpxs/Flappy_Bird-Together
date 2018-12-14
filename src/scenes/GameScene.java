@@ -119,7 +119,7 @@ public class GameScene extends Scene implements KeyListener {
                 sleep(1000);
                 mGameReady = false;
                 AudioPlay.playMusic("resources/sounds/bgm2.wav", 10);
-                mWorld.run();
+                mWorld.start();
                 mRunSpeed = 2.0;
             } catch (InterruptedException e) {
                 e.printStackTrace();
