@@ -26,7 +26,7 @@ public class Player extends Sprite {
     private Image mWeaponSlot, mFireImage, mGunImage;
 
     private boolean mHandleKey = true;
-
+    private Boolean isOnPunishTime = false;
     private boolean mWudi = false;
 
     private long mSkillSpeedUpTimer = 0;
@@ -87,7 +87,7 @@ public class Player extends Sprite {
             if (mWeaponType == WeaponType.NONE) {
                 return;
             }
-            long time = 0;
+            long time;
             Sprite bullet;
             if (mWeaponType == WeaponType.FIRE) {
                 time = FireWeapon.getLoadTime();
@@ -186,51 +186,56 @@ public class Player extends Sprite {
             return true;
         }
 
-        if (a instanceof RemotePlayer) {
-            return true;
-        }
+        return a instanceof RemotePlayer;
 
-        return false;
     }
 
     private void punishTime() {
-        new Thread(() -> {
-            Vector speed = mPhysicsBody.getSpeed();
-            speed.x = 0;
-            speed.y = 0;
 
-            mHandleKey = false;
-            mPhysicsBody.setGravityEnable(false);
-            mPhysicsBody.setCollideCode(0);
-            GameScene.mRunSpeed = 0;
+        if (isOnPunishTime) {
+            return;
+        }
+        synchronized (this) {
+            isOnPunishTime = true;
+            new Thread(() -> {
+                Vector speed = mPhysicsBody.getSpeed();
+                speed.x = 0;
+                speed.y = 0;
 
-            for (int i = 0; i < 4; i++) {
+                mHandleKey = false;
+                mPhysicsBody.setGravityEnable(false);
+                mPhysicsBody.setCollideCode(0);
+                GameScene.mRunSpeed = 0;
+
+                for (int i = 0; i < 4; i++) {
+                    try {
+                        sleep(300);
+                        setEnable(false);
+                        sleep(300);
+                        setEnable(true);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                mWudi = true;
+                mPhysicsBody.setGravityEnable(true);
+                GameScene.mRunSpeed = 2.0;
+                mPhysicsBody.setCollideCode(0x10);
+                mHandleKey = true;
+
                 try {
-                    sleep(300);
-                    setEnable(false);
-                    sleep(300);
-                    setEnable(true);
+                    sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-            }
 
-            mWudi = true;
-            mPhysicsBody.setGravityEnable(true);
-            GameScene.mRunSpeed = 2.0;
-            mPhysicsBody.setCollideCode(0x10);
-            mHandleKey = true;
+                mPhysicsBody.setCollideCode(mCollideCode);
+                mWudi = false;
+                isOnPunishTime = false;
 
-            try {
-                sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            mPhysicsBody.setCollideCode(mCollideCode);
-            mWudi = false;
-
-        }).start();
+            }).start();
+        }
     }
 
     private long isWeaponReady() {
@@ -238,7 +243,7 @@ public class Player extends Sprite {
             return Long.MAX_VALUE;
         }
 
-        long time = 0;
+        long time;
         if (mWeaponType == WeaponType.GUN) {
             time = GunWeapon.getLoadTime();
         } else {
@@ -323,7 +328,5 @@ public class Player extends Sprite {
                         182, 73);
             }
         }
-
-
     }
 }
