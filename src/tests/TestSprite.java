@@ -12,24 +12,36 @@ import javax.swing.*;
 import model.Animator;
 import model.Position;
 import model.Sprite;
+import model.action.Action;
 import model.action.FlyAction;
+import model.action.ScaleAction;
+import physics.PhysicsBody;
+import physics.shape.CircleShape;
+import physics.shape.RectangleShape;
 
 public class TestSprite extends JFrame {
 
     private Sprite player;
+    private Sprite[] mSprites = new Sprite[1];
 
     TestSprite() {
         player = new Sprite();
+        mSprites[0] = player;
+        PhysicsBody physicsBody = new PhysicsBody();
+
         Animator animator = new Animator();
         try {
             animator.addFrame(ImageIO.read(new File("resources/fireworks0.png")));
         } catch (IOException e) {
             e.printStackTrace();
         }
-        animator.setDuration(700);
+        //animator.setDuration(700);
+        physicsBody.setShape(new CircleShape(10));
+        player.setPhysicsBody(physicsBody);
 
-        FlyAction action = new FlyAction(new Position(10, 10), new Position(100, 100), 3000);
-
+        FlyAction action = new FlyAction(new Position(10, 10), new Position(95, 123), 20000);
+        player.addAction(action);
+        action = new ScaleAction(new Position(10, 10), new Position(100, 121), 20000);
         player.addAction(action);
 
         player.setAnimator(animator);
@@ -51,9 +63,32 @@ public class TestSprite extends JFrame {
         public void paint(Graphics graphics) {
             super.paint(graphics);
 
-            pos = (Position) player.getActions().get(0).getNext(pos);
+            for (Sprite s : mSprites) {
+                if (s.hasAction()) {
+                    for (Action a : s.getActions()) {
+                        if (a instanceof ScaleAction) {
+                            Position p = new Position(s.getPhysicsBody().getShape().getWidth(),
+                                    s.getPhysicsBody().getShape().getWidth());
+                            p = (Position) a.getNext(p);
+                            s.getPhysicsBody().setShape(new RectangleShape(p.x, p.y));
+                        } else if (a instanceof FlyAction) {
+                            Position p = s.getPhysicsBody().getPosition();
+                            if (s.getPhysicsBody().getPosition() == null) {
+                                System.out.println("ssssssss");
+                            }
+                            p = (Position) a.getNext(p);
+                            s.getPhysicsBody().setPosition(p);
+                        }
+                    }
+                }
 
-            graphics.drawImage(player.getAnimator().getNextFrame(), 100, 100, pos.x, pos.y, null);
+                graphics.drawImage(s.getAnimator().getNextFrame(),
+                        s.getPhysicsBody().getPosition().x,
+                        s.getPhysicsBody().getPosition().y,
+                        s.getPhysicsBody().getShape().getWidth(),
+                        s.getPhysicsBody().getShape().getHeight(), null);
+
+            }
         }
 
         void start() {

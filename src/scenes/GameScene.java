@@ -26,13 +26,13 @@ import model.weapon.FireWeapon;
 import model.weapon.GunWeapon;
 import model.weapon.UnlimitedWeapon;
 import physics.World;
-import scenes.core.Scene;
+import scenes.core.Render;
 import utils.AudioPlay;
 import utils.MMath;
 import utils.Map;
 import utils.SpriteType;
 
-public class GameScene extends Scene implements KeyListener {
+public class GameScene extends Render implements KeyListener {
     private World mWorld;
     public final static int WINDOW_WIDTH = 1280;
     public final static int WINDOW_HEIGHT = 720;
@@ -53,7 +53,6 @@ public class GameScene extends Scene implements KeyListener {
     private OnGameStateListener mGameStateListener = null;
 
     public GameScene(Map map) {
-        mSprites = new CopyOnWriteArrayList<>();
         mWorld = new World();
         mScreen = new Screen();
         mMapLength = map.mMapLength;

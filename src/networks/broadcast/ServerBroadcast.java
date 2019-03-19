@@ -53,9 +53,8 @@ public class ServerBroadcast {
                         }
                         sleep(500);
                     }
-                } catch (IOException e) {
-                    //e.printStackTrace();
-                } catch (InterruptedException e) {
+                } catch (Exception e) {
+                    e.printStackTrace();
                     return;
                 }
             }

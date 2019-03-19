@@ -39,6 +39,7 @@ public class World extends Thread {
     @Override
     public void run() {
             while (true) {
+                long startTime = System.currentTimeMillis();
                 handleCollide();
                 for (PhysicsBody body : mComponents) {
                     if (body.isFixed())
@@ -69,7 +70,7 @@ public class World extends Thread {
                 }
 
                 try {
-                    sleep(16);
+                    sleep(16 - System.currentTimeMillis() + startTime);
                 } catch (InterruptedException e) {
                     break;
                 }
@@ -100,7 +101,7 @@ public class World extends Thread {
                     boolean ha = mComponents.get(i).getParentSprite().onCollide(mComponents.get(j).getParentSprite());
                     boolean hb = mComponents.get(j).getParentSprite().onCollide(mComponents.get(i).getParentSprite());
 
-                    if (!ha | !hb) {
+                    if (!ha || !hb) {
                         Vector[] res = elasticCollision(mComponents.get(i).getWeight(),
                                 mComponents.get(i).getSpeed(),
                                 mComponents.get(j).getWeight(),
@@ -140,8 +141,22 @@ public class World extends Thread {
         //System.out.println("" + ma + " " + mb);
 
         //System.out.println("swap speed");
-        res[0] = new Vector(vb);
-        res[1] = new Vector(va);
+        Double m1 = ma;
+        Double m2 = mb;
+        Double v1 = va.x;
+        Double v2 = vb.x;
+
+        Double v1x = ((m1 - m2) * v1 + 2 * m2 * v2) / (m1 + m2);
+        Double v2x = ((m2 - m1) * v2 + 2 * m1 * v1) / (m1 + m2);
+
+        v1 = va.y;
+        v2 = vb.y;
+        Double v1y = ((m1 - m2) * v1 + 2 * m2 * v2) / (m1 + m2);
+        Double v2y = ((m2 - m1) * v2 + 2 * m1 * v1) / (m1 + m2);
+
+
+        res[0] = new Vector(v1x, v1y);
+        res[1] = new Vector(v2x, v2y);
         return res;
     }
 

@@ -7,7 +7,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -20,10 +19,10 @@ import networks.Server;
 import networks.broadcast.ServerBroadcast;
 import physics.PhysicsBody;
 import physics.shape.CircleShape;
-import scenes.core.Scene;
+import scenes.core.Render;
 import utils.AudioPlay;
 
-public class MenuScene extends Scene implements MouseListener {
+public class MenuScene extends Render implements MouseListener {
     private final static int WINDOW_WIDTH = 1280;
     private final static int WINDOW_HEIGHT = 720;
 
@@ -34,7 +33,6 @@ public class MenuScene extends Scene implements MouseListener {
     private boolean mExit = false;
 
     public MenuScene() {
-        mSprites = new ArrayList<>();
         mScreen = new Screen();
 
         this.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);

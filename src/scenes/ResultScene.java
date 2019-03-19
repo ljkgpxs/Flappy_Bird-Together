@@ -24,10 +24,10 @@ import model.action.ScaleAction;
 import networks.ScoreItem;
 import physics.PhysicsBody;
 import physics.shape.RectangleShape;
-import scenes.core.Scene;
+import scenes.core.Render;
 import utils.AudioPlay;
 
-public class ResultScene extends Scene implements MouseListener {
+public class ResultScene extends Render implements MouseListener {
     private List<ScoreItem> mUserTime;
 
     private int mRunSpeed = 1;
@@ -44,7 +44,6 @@ public class ResultScene extends Scene implements MouseListener {
     public ResultScene(List<ScoreItem> userTime) {
         mUserTime = userTime;
         mScreen = new Screen();
-        mSprites = new CopyOnWriteArrayList<>();
         mResult = new CopyOnWriteArrayList<>();
 
         userTime.sort(Comparator.comparing(scoreItem -> scoreItem.time));
@@ -255,6 +254,7 @@ public class ResultScene extends Scene implements MouseListener {
                         s.getPhysicsBody().getPosition().y,
                         s.getPhysicsBody().getShape().getWidth(),
                         s.getPhysicsBody().getShape().getHeight(), null);
+
             }
 
             graphics.setFont(new Font("黑体", Font.BOLD, 20));

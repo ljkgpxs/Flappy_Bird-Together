@@ -14,7 +14,6 @@ public class Sprite {
     private List<Action> mActions = null;
     protected Animator mAnimator = null;
     protected PhysicsBody mPhysicsBody = null;
-    private Weapon mWeapon = null;
 
     private KeyListener mKeyListener;
 
@@ -49,14 +48,6 @@ public class Sprite {
     public void setPhysicsBody(PhysicsBody physicsBody) {
         mPhysicsBody = physicsBody;
         mPhysicsBody.setParentSprite(this);
-    }
-
-    public Weapon getWeapon() {
-        return mWeapon;
-    }
-
-    public void setWeapon(Weapon weapon) {
-        mWeapon = weapon;
     }
 
     public boolean hasAction() {

@@ -17,10 +17,10 @@ import networks.Server;
 import networks.broadcast.IpPort;
 import networks.broadcast.ServerBroadcast;
 import networks.broadcast.ServerScanner;
-import scenes.core.Scene;
+import scenes.core.Render;
 import utils.AudioPlay;
 
-public class RoomScene extends Scene implements OnGameStateListener, OnPlayerJoinedListener {
+public class RoomScene extends Render implements OnGameStateListener, OnPlayerJoinedListener {
 
     private JLabel mJLabel;
     private JLabel mStartButton;
